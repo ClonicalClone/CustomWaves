@@ -2,6 +2,8 @@ import { useCallback } from 'react';
 import { Vector3 } from 'three';
 
 export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference';
+export type ColorMode = 'height' | 'velocity' | 'gradient' | 'rainbow';
+export type AnimationMode = 'smooth' | 'pulse' | 'chaotic' | 'freeze';
 
 interface UsePointCloudProps {
   positions: Float32Array;
@@ -12,6 +14,9 @@ interface UsePointCloudProps {
   speed: number;
   complexity: number;
   mathFunction: MathFunction;
+  animationMode: AnimationMode;
+  turbulence: number;
+  mouseInfluence: number;
 }
 
 export function usePointCloud({ 
@@ -22,7 +27,10 @@ export function usePointCloud({
   frequency,
   speed,
   complexity,
-  mathFunction
+  mathFunction,
+  animationMode,
+  turbulence,
+  mouseInfluence
 }: UsePointCloudProps) {
   
   const calculateMathFunction = useCallback((
@@ -86,7 +94,7 @@ export function usePointCloud({
         const wavesNoise = Math.sin(x * 0.8 + timeSpeed * 0.5) * Math.cos(z * 0.6 + timeSpeed * 0.7) * 0.1;
         return (waveX + waveZ + ripple + wavesNoise) * amplitude + mouseEffect;
     }
-  }, [amplitude, frequency, speed, complexity, mathFunction]);
+  }, [amplitude, frequency, speed, complexity, mathFunction, animationMode, turbulence, mouseInfluence]);
   
   const updateSurface = useCallback((
     positionArray: Float32Array,
@@ -110,11 +118,33 @@ export function usePointCloud({
           Math.pow(z - mousePosition.z, 2)
         );
         
-        const mouseInfluence = Math.max(0, 1 - mouseDistance / 4);
-        const mouseEffect = mouseInfluence * amplitude * 1.5 * Math.sin(time * speed * 3);
+        const mouseInfluenceRadius = Math.max(0, 1 - mouseDistance / 4);
+        let mouseEffect = mouseInfluenceRadius * amplitude * mouseInfluence * Math.sin(time * speed * 3);
+        
+        // Apply animation mode effects
+        let animationMultiplier = 1;
+        switch (animationMode) {
+          case 'pulse':
+            animationMultiplier = 0.5 + 0.5 * Math.sin(time * 2);
+            break;
+          case 'chaotic':
+            animationMultiplier = 0.7 + 0.3 * Math.random();
+            break;
+          case 'freeze':
+            animationMultiplier = 0;
+            break;
+        }
+        
+        mouseEffect *= animationMultiplier;
         
         // Calculate Y position based on selected mathematical function
-        const y = calculateMathFunction(x, z, time, mouseInfluence, mouseEffect);
+        let y = calculateMathFunction(x, z, time, mouseInfluenceRadius, mouseEffect);
+        
+        // Add turbulence effect
+        if (turbulence > 0) {
+          const turbulenceEffect = (Math.random() - 0.5) * turbulence * amplitude * 0.3;
+          y += turbulenceEffect;
+        }
         
         positionArray[index + 1] = y;
       }

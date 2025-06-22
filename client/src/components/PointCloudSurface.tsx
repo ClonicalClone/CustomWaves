@@ -22,25 +22,54 @@ function PointCloudSurface({
   const targetMousePosition = useRef(new Vector3(0, 0, 0));
   
   // Get controls from store
-  const { mathFunction, amplitude, frequency, speed, complexity } = useSurfaceControls();
+  const { 
+    mathFunction, 
+    amplitude, 
+    frequency, 
+    speed, 
+    complexity, 
+    colorMode,
+    pointSize,
+    resolution: storeResolution,
+    mouseInfluence,
+    animationMode,
+    turbulence
+  } = useSurfaceControls();
   
-  // Generate point cloud data
+  const actualResolution = resolution || storeResolution;
+  
+  // Generate point cloud data with dynamic colors
   const { positions, colors } = useMemo(() => {
     const positions: number[] = [];
     const colors: number[] = [];
     
-    const spacing = width / resolution;
+    const spacing = width / actualResolution;
     
-    for (let i = 0; i <= resolution; i++) {
-      for (let j = 0; j <= resolution; j++) {
-        const x = (i - resolution / 2) * spacing;
-        const z = (j - resolution / 2) * spacing;
+    for (let i = 0; i <= actualResolution; i++) {
+      for (let j = 0; j <= actualResolution; j++) {
+        const x = (i - actualResolution / 2) * spacing;
+        const z = (j - actualResolution / 2) * spacing;
         const y = 0; // Start flat, will be animated
         
         positions.push(x, y, z);
         
-        // White color for all points
-        colors.push(1, 1, 1);
+        // Dynamic color based on color mode
+        switch (colorMode) {
+          case 'rainbow':
+            const hue = (i + j) / (actualResolution * 2);
+            colors.push(
+              0.5 + 0.5 * Math.cos(hue * Math.PI * 6),
+              0.5 + 0.5 * Math.cos(hue * Math.PI * 6 + 2),
+              0.5 + 0.5 * Math.cos(hue * Math.PI * 6 + 4)
+            );
+            break;
+          case 'gradient':
+            const grad = Math.sqrt(x * x + z * z) / (width * 0.5);
+            colors.push(1 - grad * 0.5, 0.5 + grad * 0.5, 1);
+            break;
+          default:
+            colors.push(1, 1, 1); // White
+        }
       }
     }
     
@@ -48,18 +77,21 @@ function PointCloudSurface({
       positions: new Float32Array(positions),
       colors: new Float32Array(colors)
     };
-  }, [width, resolution]);
+  }, [width, actualResolution, colorMode]);
   
   // Custom hook for point cloud management
   const { updateSurface } = usePointCloud({
     positions,
-    resolution,
+    resolution: actualResolution,
     width,
     amplitude,
     frequency,
     speed,
     complexity,
-    mathFunction
+    mathFunction,
+    animationMode,
+    turbulence,
+    mouseInfluence
   });
   
   // Create geometry and material
@@ -72,13 +104,13 @@ function PointCloudSurface({
   
   const material = useMemo(() => {
     return new PointsMaterial({
-      size: 0.08,
+      size: pointSize,
       vertexColors: true,
       transparent: false,
       alphaTest: 0.5,
       sizeAttenuation: true
     });
-  }, []);
+  }, [pointSize]);
   
   // Animation loop
   useFrame((state) => {
@@ -98,7 +130,7 @@ function PointCloudSurface({
       positionAttribute.array as Float32Array, 
       time, 
       mousePosition.current,
-      resolution,
+      actualResolution,
       width
     );
     

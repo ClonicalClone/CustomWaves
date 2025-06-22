@@ -1,7 +1,9 @@
 import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import Scene from './components/Scene';
-import { Controls } from './components/ui/Controls';
+import { AdvancedControls } from './components/ui/AdvancedControls';
+import { EquationDisplay } from './components/ui/EquationDisplay';
+import { StatusBar } from './components/StatusBar';
 import { useSurfaceControls } from './lib/stores/useSurfaceControls';
 import './index.css';
 
@@ -12,13 +14,49 @@ function App() {
     frequency,
     speed,
     complexity,
+    colorMode,
+    pointSize,
+    resolution,
+    mouseInfluence,
+    animationMode,
+    turbulence,
+    damping,
+    showTrails,
+    showGrid,
+    autoRotate,
+    showEquations,
     setMathFunction,
     setAmplitude,
     setFrequency,
     setSpeed,
     setComplexity,
-    reset
+    setColorMode,
+    setPointSize,
+    setResolution,
+    setMouseInfluence,
+    setAnimationMode,
+    setTurbulence,
+    setDamping,
+    setShowTrails,
+    setShowGrid,
+    setAutoRotate,
+    reset,
+    randomize,
+    exportSettings
   } = useSurfaceControls();
+
+  const handleExport = () => {
+    const settings = exportSettings();
+    const blob = new Blob([settings], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `surface-config-${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#000000' }}>
@@ -42,19 +80,53 @@ function App() {
         </Suspense>
       </Canvas>
       
-      <Controls
+      <AdvancedControls
         mathFunction={mathFunction}
         amplitude={amplitude}
         frequency={frequency}
         speed={speed}
         complexity={complexity}
+        colorMode={colorMode}
+        pointSize={pointSize}
+        resolution={resolution}
+        mouseInfluence={mouseInfluence}
+        animationMode={animationMode}
+        turbulence={turbulence}
+        damping={damping}
+        showTrails={showTrails}
+        showGrid={showGrid}
+        autoRotate={autoRotate}
         onMathFunctionChange={setMathFunction}
         onAmplitudeChange={setAmplitude}
         onFrequencyChange={setFrequency}
         onSpeedChange={setSpeed}
         onComplexityChange={setComplexity}
+        onColorModeChange={setColorMode}
+        onPointSizeChange={setPointSize}
+        onResolutionChange={setResolution}
+        onMouseInfluenceChange={setMouseInfluence}
+        onAnimationModeChange={setAnimationMode}
+        onTurbulenceChange={setTurbulence}
+        onDampingChange={setDamping}
+        onShowTrailsChange={setShowTrails}
+        onShowGridChange={setShowGrid}
+        onAutoRotateChange={setAutoRotate}
         onReset={reset}
+        onRandomize={randomize}
+        onExport={handleExport}
       />
+      
+      {showEquations && (
+        <EquationDisplay
+          mathFunction={mathFunction}
+          amplitude={amplitude}
+          frequency={frequency}
+          speed={speed}
+          complexity={complexity}
+        />
+      )}
+      
+      {/* <StatusBar /> */}
     </div>
   );
 }
