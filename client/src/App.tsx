@@ -1,9 +1,25 @@
 import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import Scene from './components/Scene';
+import { Controls } from './components/ui/Controls';
+import { useSurfaceControls } from './lib/stores/useSurfaceControls';
 import './index.css';
 
 function App() {
+  const {
+    mathFunction,
+    amplitude,
+    frequency,
+    speed,
+    complexity,
+    setMathFunction,
+    setAmplitude,
+    setFrequency,
+    setSpeed,
+    setComplexity,
+    reset
+  } = useSurfaceControls();
+
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#000000' }}>
       <Canvas
@@ -25,6 +41,20 @@ function App() {
           <Scene />
         </Suspense>
       </Canvas>
+      
+      <Controls
+        mathFunction={mathFunction}
+        amplitude={amplitude}
+        frequency={frequency}
+        speed={speed}
+        complexity={complexity}
+        onMathFunctionChange={setMathFunction}
+        onAmplitudeChange={setAmplitude}
+        onFrequencyChange={setFrequency}
+        onSpeedChange={setSpeed}
+        onComplexityChange={setComplexity}
+        onReset={reset}
+      />
     </div>
   );
 }

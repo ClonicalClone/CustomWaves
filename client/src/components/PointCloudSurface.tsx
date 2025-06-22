@@ -3,32 +3,31 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Vector3, BufferGeometry, BufferAttribute, Points, PointsMaterial } from 'three';
 import * as THREE from 'three';
 import { usePointCloud } from '../hooks/usePointCloud';
+import { useSurfaceControls } from '../lib/stores/useSurfaceControls';
 
 interface PointCloudSurfaceProps {
   width?: number;
   height?: number;
   resolution?: number;
-  amplitude?: number;
-  frequency?: number;
 }
 
 function PointCloudSurface({ 
   width = 20, 
   height = 20, 
-  resolution = 100,
-  amplitude = 2,
-  frequency = 0.5
+  resolution = 80
 }: PointCloudSurfaceProps) {
   const pointsRef = useRef<Points>(null);
-  const { mouse, raycaster, camera } = useThree();
+  const { mouse } = useThree();
   const mousePosition = useRef(new Vector3(0, 0, 0));
   const targetMousePosition = useRef(new Vector3(0, 0, 0));
   
+  // Get controls from store
+  const { mathFunction, amplitude, frequency, speed, complexity } = useSurfaceControls();
+  
   // Generate point cloud data
-  const { positions, colors, indices } = useMemo(() => {
+  const { positions, colors } = useMemo(() => {
     const positions: number[] = [];
     const colors: number[] = [];
-    const indices: number[] = [];
     
     const spacing = width / resolution;
     
@@ -42,17 +41,14 @@ function PointCloudSurface({
         
         // White color for all points
         colors.push(1, 1, 1);
-        
-        indices.push(i * (resolution + 1) + j);
       }
     }
     
     return {
       positions: new Float32Array(positions),
-      colors: new Float32Array(colors),
-      indices
+      colors: new Float32Array(colors)
     };
-  }, [width, height, resolution]);
+  }, [width, resolution]);
   
   // Custom hook for point cloud management
   const { updateSurface } = usePointCloud({
@@ -60,7 +56,10 @@ function PointCloudSurface({
     resolution,
     width,
     amplitude,
-    frequency
+    frequency,
+    speed,
+    complexity,
+    mathFunction
   });
   
   // Create geometry and material
@@ -73,7 +72,7 @@ function PointCloudSurface({
   
   const material = useMemo(() => {
     return new PointsMaterial({
-      size: 0.1,
+      size: 0.08,
       vertexColors: true,
       transparent: false,
       alphaTest: 0.5,
@@ -82,7 +81,7 @@ function PointCloudSurface({
   }, []);
   
   // Animation loop
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (!pointsRef.current) return;
     
     // Smooth mouse position interpolation
@@ -107,8 +106,7 @@ function PointCloudSurface({
   });
   
   return (
-    <points ref={pointsRef} geometry={geometry} material={material}>
-    </points>
+    <points ref={pointsRef} geometry={geometry} material={material} />
   );
 }
 
