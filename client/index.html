@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Point Cloud Surface</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: #000000;
+        font-family: 'Inter', sans-serif;
+      }
+      
+      #root {
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+      }
+      
+      canvas {
+        display: block;
+        touch-action: none;
+      }
+      
+      .controls-info {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: white;
+        font-size: 14px;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      .controls-info h3 {
+        margin: 0 0 10px 0;
+        font-size: 16px;
+        color: #ffffff;
+      }
+      
+      .controls-info p {
+        margin: 5px 0;
+        color: #cccccc;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div class="controls-info">
+      <h3>Controls</h3>
+      <p>• Mouse drag: Rotate view</p>
+      <p>• Mouse wheel: Zoom in/out</p>
+      <p>• Right click drag: Pan</p>
+      <p>• Hover over surface: Interact</p>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
