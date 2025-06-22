@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { Badge } from './badge';
 
-export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference';
+export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference' | 'laplace' | 'fourier' | 'bessel' | 'legendre';
 
 interface EquationDisplayProps {
   mathFunction: MathFunction;
@@ -68,6 +68,34 @@ const equations = {
     description: "Complex superposition with mathematical constant phase relationships",
     category: "Wave Mechanics",
     concept: "Demonstrates principle of superposition in multi-dimensional wave systems"
+  },
+  laplace: {
+    title: "Laplace Equation",
+    equation: "y = A·[r·cos(fθ + st)·e⁻⁰·¹r + r·sin(2fθ + 0.7st)·e⁻⁰·⁰⁸r·0.5]",
+    description: "Harmonic functions satisfying Laplace's equation in polar coordinates",
+    category: "Partial Differential Equations",
+    concept: "Models steady-state heat distribution and gravitational potential fields"
+  },
+  fourier: {
+    title: "Fourier Series",
+    equation: "y = A·Σₙ₌₁⁵[sin(nfx + st)/n + sin(nfz + 1.2st)/n] + A·cos(xzf/10 + st/2)·0.3",
+    description: "Truncated Fourier series with harmonic decomposition",
+    category: "Harmonic Analysis",
+    concept: "Represents periodic functions as sum of sinusoidal components"
+  },
+  bessel: {
+    title: "Bessel Functions",
+    equation: "y = A·[J₀(fr - st)·e⁻⁰·¹|fr-st| + J₁(fr - st)·(fr-st)·e⁻⁰·¹|fr-st|·0.5 + sin(3θ + 0.8st)·0.2]",
+    description: "Cylindrical wave solutions using Bessel function approximations",
+    category: "Special Functions",
+    concept: "Models vibrations in circular membranes and electromagnetic waves in cylinders"
+  },
+  legendre: {
+    title: "Legendre Polynomials",
+    equation: "y = A·[P₂(x̂)·sin(ft) + P₂(ẑ)·sin(ft) + P₃(x̂)·cos(0.7ft)·0.6]",
+    description: "Orthogonal polynomials on normalized spatial coordinates",
+    category: "Orthogonal Polynomials",
+    concept: "Used in spherical harmonics and quantum mechanical angular momentum"
   }
 };
 
@@ -86,18 +114,18 @@ export function EquationDisplay({ mathFunction, amplitude, frequency, speed, com
   };
 
   return (
-    <Card className="absolute bottom-4 left-4 w-96 bg-black/90 border-white/20 text-white">
+    <Card className="absolute bottom-4 left-4 w-96 bg-black/90 border-white/20 text-white rounded-2xl">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">{eq.title}</CardTitle>
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className="text-xs rounded-full">
             {eq.category}
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Equation */}
-        <div className="bg-gray-900/50 p-3 rounded border border-gray-700">
+        <div className="bg-gray-900/50 p-3 rounded-xl border border-gray-700">
           <p className="text-sm font-mono text-green-400 leading-relaxed">
             {eq.equation}
           </p>
@@ -109,7 +137,7 @@ export function EquationDisplay({ mathFunction, amplitude, frequency, speed, com
         </p>
         
         {/* Mathematical Concept */}
-        <div className="bg-gray-800/50 p-2 rounded border border-gray-600">
+        <div className="bg-gray-800/50 p-2 rounded-xl border border-gray-600">
           <p className="text-xs text-gray-200 leading-relaxed">
             <span className="font-semibold text-blue-300">Concept:</span> {eq.concept}
           </p>

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { Vector3 } from 'three';
 
-export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference';
+export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference' | 'laplace' | 'fourier' | 'bessel' | 'legendre';
 export type ColorMode = 'height' | 'velocity' | 'gradient' | 'rainbow';
 export type AnimationMode = 'smooth' | 'pulse' | 'chaotic' | 'freeze';
 
@@ -103,6 +103,42 @@ export function usePointCloud({
                                   Math.exp(-Math.min(distance1, distance2) * 0.04);
         const carrierWave = Math.sin(waveNumber * (distance1 + distance2) / 2 - timeSpeed * 2);
         return interferencePattern * carrierWave * amplitude + mouseEffect;
+      
+      case 'laplace':
+        // Laplace equation solution in 2D (harmonic functions)
+        const r = Math.sqrt(x * x + z * z);
+        const theta = Math.atan2(z, x);
+        const laplacian = r * Math.cos(freq * theta + timeSpeed) * Math.exp(-r * 0.1) +
+                         r * Math.sin(freq * theta * 2 + timeSpeed * 0.7) * Math.exp(-r * 0.08) * 0.5;
+        return laplacian * amplitude + mouseEffect;
+      
+      case 'fourier':
+        // Fourier series representation
+        let fourierSum = 0;
+        for (let n = 1; n <= 5; n++) {
+          const harmonic = Math.sin(n * freq * x + timeSpeed) / n + Math.sin(n * freq * z + timeSpeed * 1.2) / n;
+          fourierSum += harmonic;
+        }
+        const fourierModulation = Math.cos(x * z * freq * 0.1 + timeSpeed * 0.5) * 0.3;
+        return (fourierSum + fourierModulation) * amplitude * 0.3 + mouseEffect;
+      
+      case 'bessel':
+        // Bessel function approximation
+        const besselArg = freq * Math.sqrt(x * x + z * z) - timeSpeed;
+        const besselJ0 = Math.cos(besselArg) * Math.exp(-Math.abs(besselArg) * 0.1);
+        const besselJ1 = Math.sin(besselArg) * besselArg * Math.exp(-Math.abs(besselArg) * 0.1) * 0.5;
+        const besselModulation = Math.sin(theta * 3 + timeSpeed * 0.8) * 0.2;
+        return (besselJ0 + besselJ1 + besselModulation) * amplitude + mouseEffect;
+      
+      case 'legendre':
+        // Legendre polynomials in normalized coordinates
+        const xNorm = x / (width * 0.5);
+        const zNorm = z / (width * 0.5);
+        const P2x = 0.5 * (3 * xNorm * xNorm - 1);
+        const P2z = 0.5 * (3 * zNorm * zNorm - 1);
+        const P3x = 0.5 * xNorm * (5 * xNorm * xNorm - 3);
+        const legendre = (P2x + P2z) * Math.sin(timeSpeed * freq) + P3x * Math.cos(timeSpeed * freq * 0.7) * 0.6;
+        return legendre * amplitude + mouseEffect;
       
       case 'waves':
       default:

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference';
+export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference' | 'laplace' | 'fourier' | 'bessel' | 'legendre';
 export type ColorMode = 'height' | 'velocity' | 'gradient' | 'rainbow';
 export type AnimationMode = 'smooth' | 'pulse' | 'chaotic' | 'freeze';
 
@@ -93,7 +93,7 @@ export const useSurfaceControls = create<SurfaceControlsState>((set, get) => ({
   reset: () => set(defaultValues),
   
   randomize: () => {
-    const functions: MathFunction[] = ['waves', 'sin', 'cos', 'tan', 'electric', 'ripples', 'spiral', 'interference'];
+    const functions: MathFunction[] = ['waves', 'sin', 'cos', 'tan', 'electric', 'ripples', 'spiral', 'interference', 'laplace', 'fourier', 'bessel', 'legendre'];
     const colorModes: ColorMode[] = ['height', 'velocity', 'gradient', 'rainbow'];
     const animationModes: AnimationMode[] = ['smooth', 'pulse', 'chaotic'];
     

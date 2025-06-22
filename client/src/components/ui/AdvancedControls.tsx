@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { Badge } from './badge';
 import { Separator } from './separator';
 
-export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference';
+export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference' | 'laplace' | 'fourier' | 'bessel' | 'legendre';
 export type ColorMode = 'height' | 'velocity' | 'gradient' | 'rainbow';
 export type AnimationMode = 'smooth' | 'pulse' | 'chaotic' | 'freeze';
 
@@ -92,12 +92,12 @@ export function AdvancedControls({
   onExport
 }: AdvancedControlsProps) {
   return (
-    <Card className="absolute top-4 right-4 w-80 max-h-[90vh] overflow-y-auto bg-black/95 border-white/20 text-white">
+    <Card className="absolute top-4 right-4 w-80 max-h-[90vh] overflow-y-auto bg-black/95 border-white/20 text-white rounded-2xl">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Surface Studio Pro</CardTitle>
-          <Badge variant="outline" className="text-xs bg-gradient-to-r from-blue-500 to-purple-500">
-            Premium
+          <CardTitle className="text-lg">Mathematical Surface Control</CardTitle>
+          <Badge variant="outline" className="text-xs rounded-full">
+            Advanced
           </Badge>
         </div>
       </CardHeader>
@@ -107,18 +107,22 @@ export function AdvancedControls({
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-blue-400">Mathematical Function</h3>
           <Select value={mathFunction} onValueChange={onMathFunctionChange}>
-            <SelectTrigger className="bg-gray-800 border-gray-600">
+            <SelectTrigger className="bg-gray-800 border-gray-600 rounded-xl">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-600">
-              <SelectItem value="waves">🌊 Complex Waves</SelectItem>
-              <SelectItem value="sin">📈 Sine Wave</SelectItem>
-              <SelectItem value="cos">📊 Cosine Wave</SelectItem>
-              <SelectItem value="tan">📉 Tangent Wave</SelectItem>
-              <SelectItem value="electric">⚡ Electric Current</SelectItem>
-              <SelectItem value="ripples">🎯 Ripples</SelectItem>
-              <SelectItem value="spiral">🌀 Spiral</SelectItem>
-              <SelectItem value="interference">〰️ Wave Interference</SelectItem>
+            <SelectContent className="bg-gray-800 border-gray-600 rounded-xl">
+              <SelectItem value="waves">Superposition Waves</SelectItem>
+              <SelectItem value="sin">Harmonic Sine</SelectItem>
+              <SelectItem value="cos">Modulated Cosine</SelectItem>
+              <SelectItem value="tan">Arctangent Field</SelectItem>
+              <SelectItem value="electric">Electromagnetic Field</SelectItem>
+              <SelectItem value="ripples">Hydrodynamic Waves</SelectItem>
+              <SelectItem value="spiral">Fibonacci Spiral</SelectItem>
+              <SelectItem value="interference">Double-Slit Interference</SelectItem>
+              <SelectItem value="laplace">Laplace Equation</SelectItem>
+              <SelectItem value="fourier">Fourier Series</SelectItem>
+              <SelectItem value="bessel">Bessel Functions</SelectItem>
+              <SelectItem value="legendre">Legendre Polynomials</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -135,7 +139,7 @@ export function AdvancedControls({
               min={0.1}
               max={8.0}
               step={0.1}
-              className="w-full"
+              className="w-full rounded-xl"
             />
           </div>
 
@@ -147,7 +151,7 @@ export function AdvancedControls({
               min={0.1}
               max={5.0}
               step={0.1}
-              className="w-full"
+              className="w-full rounded-xl"
             />
           </div>
 
@@ -159,7 +163,7 @@ export function AdvancedControls({
               min={0.0}
               max={8.0}
               step={0.1}
-              className="w-full"
+              className="w-full rounded-xl"
             />
           </div>
 
@@ -171,7 +175,7 @@ export function AdvancedControls({
               min={0.1}
               max={5.0}
               step={0.1}
-              className="w-full"
+              className="w-full rounded-xl"
             />
           </div>
         </div>
@@ -185,10 +189,10 @@ export function AdvancedControls({
           <div className="space-y-2">
             <label className="text-xs font-medium">Color Mode</label>
             <Select value={colorMode} onValueChange={onColorModeChange}>
-              <SelectTrigger className="bg-gray-800 border-gray-600">
+              <SelectTrigger className="bg-gray-800 border-gray-600 rounded-xl">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
+              <SelectContent className="bg-gray-800 border-gray-600 rounded-xl">
                 <SelectItem value="height">Height-based</SelectItem>
                 <SelectItem value="velocity">Velocity-based</SelectItem>
                 <SelectItem value="gradient">Gradient</SelectItem>
@@ -243,10 +247,10 @@ export function AdvancedControls({
           <div className="space-y-2">
             <label className="text-xs font-medium">Animation Mode</label>
             <Select value={animationMode} onValueChange={onAnimationModeChange}>
-              <SelectTrigger className="bg-gray-800 border-gray-600">
+              <SelectTrigger className="bg-gray-800 border-gray-600 rounded-xl">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
+              <SelectContent className="bg-gray-800 border-gray-600 rounded-xl">
                 <SelectItem value="smooth">Smooth</SelectItem>
                 <SelectItem value="pulse">Pulse</SelectItem>
                 <SelectItem value="chaotic">Chaotic</SelectItem>
@@ -310,24 +314,24 @@ export function AdvancedControls({
             <Button 
               onClick={onRandomize}
               variant="outline"
-              className="text-xs bg-gradient-to-r from-pink-500 to-purple-500 border-none"
+              className="text-xs bg-blue-600 hover:bg-blue-700 border-gray-600 rounded-xl"
             >
-              🎲 Randomize
+              Randomize
             </Button>
             <Button 
               onClick={onExport}
               variant="outline"
-              className="text-xs bg-gradient-to-r from-green-500 to-blue-500 border-none"
+              className="text-xs bg-green-600 hover:bg-green-700 border-gray-600 rounded-xl"
             >
-              💾 Export
+              Export
             </Button>
           </div>
           <Button 
             onClick={onReset}
             variant="outline"
-            className="w-full text-xs bg-gray-800 border-gray-600 hover:bg-gray-700"
+            className="w-full text-xs bg-gray-800 border-gray-600 hover:bg-gray-700 rounded-xl"
           >
-            🔄 Reset All
+            Reset All
           </Button>
         </div>
       </CardContent>
