@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import Scene from './components/Scene';
 import { AdvancedControls } from './components/ui/AdvancedControls';
 import { EquationDisplay } from './components/ui/EquationDisplay';
-import { StatusBar } from './components/StatusBar';
+import { InteractiveControlsOverlay } from './components/InteractiveControlsOverlay';
 import { useSurfaceControls } from './lib/stores/useSurfaceControls';
 import './index.css';
 
@@ -126,7 +126,7 @@ function App() {
         />
       )}
       
-      {/* <StatusBar /> */}
+      <InteractiveControlsOverlay />
     </div>
   );
 }
