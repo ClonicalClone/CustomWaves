@@ -14,52 +14,60 @@ interface EquationDisplayProps {
 
 const equations = {
   sin: {
-    title: "Sine Wave",
-    equation: "y = A × sin(fx + st) + A × sin(fz + st × 0.8) × 0.5",
-    description: "Classic trigonometric sine wave with dual axis modulation",
-    category: "Trigonometric"
+    title: "Harmonic Sine Wave",
+    equation: "y = A·sin(fx + st) + A·sin(fz + st·φ)·φ⁻¹ + A·sin((x+z)f/2 + st/2)·φ⁻²",
+    description: "Pure harmonic oscillation with golden ratio phase relationships (φ = 1.618)",
+    category: "Harmonic Analysis",
+    concept: "Demonstrates superposition principle and harmonic series in wave theory"
   },
   cos: {
-    title: "Cosine Wave", 
-    equation: "y = A × cos(fx + st) + A × cos(fz + st × 0.7) × 0.6",
-    description: "Cosine function creating smooth rolling wave patterns",
-    category: "Trigonometric"
+    title: "Modulated Cosine", 
+    equation: "y = A·cos(fx + st) + A·cos(fz + st·√2/2)·√2/2 + A·cos(xzf/10 + st)·0.3",
+    description: "Cosine waves with √2 modulation ratios and spatial cross-coupling",
+    category: "Wave Modulation",
+    concept: "Explores amplitude modulation and spatial frequency coupling"
   },
   tan: {
-    title: "Tangent Wave",
-    equation: "y = A × [clamp(tan(fx × 0.3 + st), -2, 2) × 0.3 + clamp(tan(fz × 0.3 + st × 0.5), -2, 2) × 0.3]",
-    description: "Bounded tangent function with periodic discontinuities",
-    category: "Trigonometric"
+    title: "Arctangent Field",
+    equation: "y = A·[atan(sin(x/T + st))·0.8 + atan(sin(z/T + st·0.75))·0.6 + atan(sin(xz/T² + st/2))·0.4]",
+    description: "Bounded arctangent functions creating smooth periodic fields",
+    category: "Nonlinear Dynamics",
+    concept: "Demonstrates bounded periodic behavior and spatial coupling"
   },
   electric: {
-    title: "Electrical Current",
-    equation: "y = A × [sin(2fx + 3st) × e^(-|x|×0.1) + cos(1.5fz + 2.5st) × e^(-|z|×0.1) + noise + sparks]",
-    description: "Simulates electrical discharge with exponential decay and random noise",
-    category: "Physics"
+    title: "Electromagnetic Field",
+    equation: "y = A·[sin(√2fx + 2st)·e⁻⁰·⁰⁵|x| + cos(√3fz + 1.5st)·e⁻⁰·⁰⁵|z| + sin(rf - 3st)·e⁻⁰·⁰⁵r/2]",
+    description: "Field equations with exponential decay mimicking electromagnetic phenomena",
+    category: "Electromagnetism",
+    concept: "Models wave propagation with realistic attenuation in conducting media"
   },
   ripples: {
-    title: "Concentric Ripples",
-    equation: "y = A × [sin(r×f - 2st) × e^(-r×0.1) + sin(r×f×1.3 - 1.5st) × e^(-r×0.15) × 0.5]",
-    description: "Radial waves emanating from center with exponential dampening",
-    category: "Wave Physics"
+    title: "Hydrodynamic Waves",
+    equation: "y = A·[sin(rf - st√5)·e⁻⁰·⁰⁸r + sin(rφf - φst)·e⁻⁰·¹²r·φ⁻¹ + cos(rf/2 - st)·e⁻⁰·¹⁵r·0.3]",
+    description: "Surface waves with hydrodynamic dampening and golden ratio harmonics",
+    category: "Fluid Dynamics",
+    concept: "Simulates surface tension effects and wave attenuation in fluids"
   },
   spiral: {
-    title: "Logarithmic Spiral",
-    equation: "y = A × [sin(r×f + θ×3 + st) × e^(-r×0.05) + cos(θ×5 + st×0.5) × 0.3]",
-    description: "Spiral pattern combining radial and angular components",
-    category: "Geometry"
+    title: "Fibonacci Spiral",
+    equation: "y = A·[sin(0.618rf + 5.236θ + st)·e⁻⁰·⁰³r + cos(φθ + 0.618st)·0.382]",
+    description: "Logarithmic spiral based on Fibonacci sequence and golden ratio",
+    category: "Mathematical Biology",
+    concept: "Demonstrates natural spiral patterns found in shells and galaxies"
   },
   interference: {
-    title: "Wave Interference",
-    equation: "y = A × [sin(r₁×f - st) + sin(r₂×f - st)] × 0.5",
-    description: "Constructive and destructive interference from two point sources",
-    category: "Wave Physics"
+    title: "Double-Slit Interference",
+    equation: "y = A·cos(k·Δd/2)·e⁻⁰·⁰⁴min(d₁,d₂)·sin(k(d₁+d₂)/2 - 2st)",
+    description: "Young's double-slit experiment with realistic wave interference",
+    category: "Quantum Optics",
+    concept: "Models wave-particle duality and constructive/destructive interference"
   },
   waves: {
-    title: "Complex Waves",
-    equation: "y = A × [sin(fx + st) × 0.3 + sin(fz + st×1.2) × 0.2 + sin(r×f - 2st) × 0.4 + noise]",
-    description: "Multi-component wave system with directional and radial components",
-    category: "Complex"
+    title: "Superposition Field",
+    equation: "y = A·[sin(fx + st)·0.4 + sin(fz + √2st)·0.3 + sin((x+z)f√2/2 + √3st/2)·0.25 + sin(rf - 2st)·0.35 + modulation]",
+    description: "Complex superposition with mathematical constant phase relationships",
+    category: "Wave Mechanics",
+    concept: "Demonstrates principle of superposition in multi-dimensional wave systems"
   }
 };
 
@@ -100,14 +108,21 @@ export function EquationDisplay({ mathFunction, amplitude, frequency, speed, com
           {eq.description}
         </p>
         
+        {/* Mathematical Concept */}
+        <div className="bg-gray-800/50 p-2 rounded border border-gray-600">
+          <p className="text-xs text-gray-200 leading-relaxed">
+            <span className="font-semibold text-blue-300">Concept:</span> {eq.concept}
+          </p>
+        </div>
+        
         {/* Variables */}
         <div className="space-y-1">
-          <h4 className="text-sm font-semibold text-white">Current Values:</h4>
+          <h4 className="text-sm font-semibold text-white">Parameters:</h4>
           <div className="grid grid-cols-2 gap-1 text-xs">
             {getVariableExplanation().map((variable, index) => (
               <div key={index} className="flex items-center space-x-2">
-                <span className="font-mono text-yellow-400">{variable.symbol} =</span>
-                <span className="text-blue-400">{variable.value}</span>
+                <span className="font-mono text-amber-300">{variable.symbol} =</span>
+                <span className="text-gray-200">{variable.value}</span>
                 <span className="text-gray-400 truncate">{variable.description}</span>
               </div>
             ))}

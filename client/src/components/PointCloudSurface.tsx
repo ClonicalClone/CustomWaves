@@ -53,22 +53,27 @@ function PointCloudSurface({
         
         positions.push(x, y, z);
         
-        // Dynamic color based on color mode
+        // Sophisticated pale color scheme based on mathematical properties
         switch (colorMode) {
-          case 'rainbow':
-            const hue = (i + j) / (actualResolution * 2);
-            colors.push(
-              0.5 + 0.5 * Math.cos(hue * Math.PI * 6),
-              0.5 + 0.5 * Math.cos(hue * Math.PI * 6 + 2),
-              0.5 + 0.5 * Math.cos(hue * Math.PI * 6 + 4)
-            );
+          case 'height':
+            // Subtle grayscale based on theoretical height variation
+            const heightFactor = Math.sin(x * 0.2) * Math.cos(z * 0.2);
+            const grayValue = 0.7 + heightFactor * 0.3;
+            colors.push(grayValue, grayValue, grayValue);
             break;
           case 'gradient':
-            const grad = Math.sqrt(x * x + z * z) / (width * 0.5);
-            colors.push(1 - grad * 0.5, 0.5 + grad * 0.5, 1);
+            // Pale blue-to-white gradient representing mathematical distance
+            const distance = Math.sqrt(x * x + z * z) / (width * 0.5);
+            const paleBlue = 0.85 + distance * 0.15;
+            colors.push(paleBlue * 0.95, paleBlue * 0.97, paleBlue);
+            break;
+          case 'velocity':
+            // Monochromatic with slight variations
+            colors.push(0.8, 0.82, 0.85);
             break;
           default:
-            colors.push(1, 1, 1); // White
+            // Pure academic white
+            colors.push(0.9, 0.9, 0.9);
         }
       }
     }
@@ -106,8 +111,9 @@ function PointCloudSurface({
     return new PointsMaterial({
       size: pointSize,
       vertexColors: true,
-      transparent: false,
-      alphaTest: 0.5,
+      transparent: true,
+      opacity: 0.85,
+      alphaTest: 0.1,
       sizeAttenuation: true
     });
   }, [pointSize]);

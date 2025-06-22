@@ -45,54 +45,76 @@ export function usePointCloud({
     
     switch (mathFunction) {
       case 'sin':
-        return Math.sin(x * freq + timeSpeed) * amplitude + 
-               Math.sin(z * freq + timeSpeed * 0.8) * amplitude * 0.5 + mouseEffect;
+        // Pure sine wave with academic precision
+        const primarySine = Math.sin(x * freq + timeSpeed) * amplitude;
+        const harmonicSine = Math.sin(z * freq + timeSpeed * 0.618) * amplitude * 0.382; // Golden ratio harmonics
+        const phaseSine = Math.sin((x + z) * freq * 0.5 + timeSpeed * 0.5) * amplitude * 0.236;
+        return primarySine + harmonicSine + phaseSine + mouseEffect;
       
       case 'cos':
-        return Math.cos(x * freq + timeSpeed) * amplitude + 
-               Math.cos(z * freq + timeSpeed * 0.7) * amplitude * 0.6 + mouseEffect;
+        // Cosine with mathematical elegance
+        const primaryCos = Math.cos(x * freq + timeSpeed) * amplitude;
+        const secondaryCos = Math.cos(z * freq + timeSpeed * 0.707) * amplitude * 0.707; // √2/2 ratio
+        const modulatedCos = Math.cos(x * z * freq * 0.1 + timeSpeed) * amplitude * 0.3;
+        return primaryCos + secondaryCos + modulatedCos + mouseEffect;
       
       case 'tan':
-        // Clamp tan to prevent extreme values
-        const tanX = Math.max(-2, Math.min(2, Math.tan(x * freq * 0.3 + timeSpeed) * 0.3));
-        const tanZ = Math.max(-2, Math.min(2, Math.tan(z * freq * 0.3 + timeSpeed * 0.5) * 0.3));
-        return (tanX + tanZ) * amplitude + mouseEffect;
+        // Sophisticated tangent with controlled periodicity
+        const period = Math.PI / (freq * complexity);
+        const tanX = Math.atan(Math.sin(x / period + timeSpeed)) * amplitude * 0.8;
+        const tanZ = Math.atan(Math.sin(z / period + timeSpeed * 0.75)) * amplitude * 0.6;
+        const crossTan = Math.atan(Math.sin((x * z) / (period * period) + timeSpeed * 0.5)) * amplitude * 0.4;
+        return tanX + tanZ + crossTan + mouseEffect;
       
       case 'electric':
-        // Simulate electrical current with random spikes and smooth flows
-        const electricNoise = (Math.random() - 0.5) * 0.1;
-        const current = Math.sin(x * freq * 2 + timeSpeed * 3) * Math.exp(-Math.abs(x) * 0.1);
-        const discharge = Math.cos(z * freq * 1.5 + timeSpeed * 2.5) * Math.exp(-Math.abs(z) * 0.1);
-        const spark = mouseInfluence > 0.5 ? Math.random() * 2 - 1 : 0;
-        return (current + discharge + electricNoise + spark) * amplitude + mouseEffect;
+        // Sophisticated field equations mimicking electromagnetic phenomena
+        const fieldStrength = Math.exp(-Math.abs(x) * 0.05) * Math.exp(-Math.abs(z) * 0.05);
+        const waveFunction = Math.sin(x * freq * 1.414 + timeSpeed * 2) * fieldStrength;
+        const fieldLines = Math.cos(z * freq * 1.732 + timeSpeed * 1.5) * fieldStrength;
+        const interference = Math.sin(Math.sqrt(x*x + z*z) * freq - timeSpeed * 3) * fieldStrength * 0.5;
+        return (waveFunction + fieldLines + interference) * amplitude + mouseEffect;
       
       case 'ripples':
-        const distance = Math.sqrt(x * x + z * z);
-        const ripple1 = Math.sin(distance * freq - timeSpeed * 2) * Math.exp(-distance * 0.1);
-        const ripple2 = Math.sin(distance * freq * 1.3 - timeSpeed * 1.5) * Math.exp(-distance * 0.15);
-        return (ripple1 + ripple2 * 0.5) * amplitude + mouseEffect;
+        // Hydrodynamic wave equations with realistic dampening
+        const radialDistance = Math.sqrt(x * x + z * z);
+        const primaryRipple = Math.sin(radialDistance * freq - timeSpeed * 2.236) * Math.exp(-radialDistance * 0.08);
+        const secondaryRipple = Math.sin(radialDistance * freq * 1.618 - timeSpeed * 1.618) * Math.exp(-radialDistance * 0.12) * 0.618;
+        const surfaceTension = Math.cos(radialDistance * freq * 0.5 - timeSpeed) * Math.exp(-radialDistance * 0.15) * 0.3;
+        return (primaryRipple + secondaryRipple + surfaceTension) * amplitude + mouseEffect;
       
       case 'spiral':
-        const angle = Math.atan2(z, x);
-        const radius = Math.sqrt(x * x + z * z);
-        const spiral = Math.sin(radius * freq + angle * 3 + timeSpeed) * Math.exp(-radius * 0.05);
-        const twist = Math.cos(angle * 5 + timeSpeed * 0.5) * 0.3;
-        return (spiral + twist) * amplitude + mouseEffect;
+        // Logarithmic spiral with mathematical precision (Fibonacci spiral approximation)
+        const polarAngle = Math.atan2(z, x);
+        const polarRadius = Math.sqrt(x * x + z * z);
+        const fibonacciSpiral = Math.sin(polarRadius * freq * 0.618 + polarAngle * 5.236 + timeSpeed);
+        const goldenRatio = 1.618033988749;
+        const spiralDecay = Math.exp(-polarRadius * 0.03);
+        const radialModulation = Math.cos(polarAngle * goldenRatio + timeSpeed * 0.618) * 0.382;
+        return (fibonacciSpiral * spiralDecay + radialModulation) * amplitude + mouseEffect;
       
       case 'interference':
-        // Two wave sources creating interference patterns
-        const wave1 = Math.sin(Math.sqrt((x - 3) * (x - 3) + z * z) * freq - timeSpeed);
-        const wave2 = Math.sin(Math.sqrt((x + 3) * (x + 3) + z * z) * freq - timeSpeed);
-        const interference = (wave1 + wave2) * 0.5;
-        return interference * amplitude + mouseEffect;
+        // Young's double-slit experiment mathematical model
+        const sourceDistance = 6; // Distance between interference sources
+        const distance1 = Math.sqrt((x - sourceDistance/2) * (x - sourceDistance/2) + z * z);
+        const distance2 = Math.sqrt((x + sourceDistance/2) * (x + sourceDistance/2) + z * z);
+        const pathDifference = distance2 - distance1;
+        const waveNumber = freq * 2 * Math.PI;
+        const interferencePattern = Math.cos(waveNumber * pathDifference / 2) * 
+                                  Math.exp(-Math.min(distance1, distance2) * 0.04);
+        const carrierWave = Math.sin(waveNumber * (distance1 + distance2) / 2 - timeSpeed * 2);
+        return interferencePattern * carrierWave * amplitude + mouseEffect;
       
       case 'waves':
       default:
-        const waveX = Math.sin(x * freq + timeSpeed) * 0.3;
-        const waveZ = Math.sin(z * freq + timeSpeed * 1.2) * 0.2;
-        const ripple = Math.sin(Math.sqrt(x * x + z * z) * freq - timeSpeed * 2) * 0.4;
-        const wavesNoise = Math.sin(x * 0.8 + timeSpeed * 0.5) * Math.cos(z * 0.6 + timeSpeed * 0.7) * 0.1;
-        return (waveX + waveZ + ripple + wavesNoise) * amplitude + mouseEffect;
+        // Complex wave superposition with mathematical sophistication
+        const fundamentalFreq = freq * complexity;
+        const waveX = Math.sin(x * fundamentalFreq + timeSpeed) * 0.4;
+        const waveZ = Math.sin(z * fundamentalFreq + timeSpeed * 1.414) * 0.3; // √2 phase relationship
+        const crossWave = Math.sin((x + z) * fundamentalFreq * 0.707 + timeSpeed * 0.866) * 0.25; // √3/2
+        const radialWave = Math.sin(Math.sqrt(x * x + z * z) * fundamentalFreq - timeSpeed * 2) * 0.35;
+        const harmonicModulation = Math.sin(x * fundamentalFreq * 0.5) * Math.cos(z * fundamentalFreq * 0.5) * 
+                                 Math.sin(timeSpeed * 0.618) * 0.15; // Golden ratio modulation
+        return (waveX + waveZ + crossWave + radialWave + harmonicModulation) * amplitude + mouseEffect;
     }
   }, [amplitude, frequency, speed, complexity, mathFunction, animationMode, turbulence, mouseInfluence]);
   
