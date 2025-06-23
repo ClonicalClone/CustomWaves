@@ -356,18 +356,20 @@ export function usePointCloud({
       
       // Custom equation support
       case 'custom':
-        if (customEquation) {
+        if (customEquation && customEquation.trim()) {
           try {
             const result = evaluateCustomEquation(customEquation, x, z, timeSpeed, equationVariables);
             // Clamp result to prevent extreme values that could cause performance issues
             const clampedResult = Math.max(-10, Math.min(10, result));
-            return clampedResult + mouseEffect;
+            return clampedResult * amplitude + mouseEffect;
           } catch (e) {
             console.warn('Custom equation evaluation failed:', e);
-            return mouseEffect;
+            // Fallback to simple wave if custom equation fails
+            return Math.sin(x * frequency + timeSpeed) * amplitude + mouseEffect;
           }
         }
-        return mouseEffect;
+        // Default wave pattern when no custom equation
+        return Math.sin(x * frequency + timeSpeed) * amplitude + mouseEffect;
       
       case 'waves':
       default:
@@ -519,16 +521,8 @@ function evaluateCustomEquation(
         const x = arguments[0];
         const z = arguments[1]; 
         const t = arguments[2];
-        // Make variables directly available
-        const A = vars.A || 1;
-        const f = vars.f || 1;
-        const s = vars.s || 1;
-        const sin = vars.sin;
-        const cos = vars.cos;
-        const exp = vars.exp;
-        const sqrt = vars.sqrt;
-        const abs = vars.abs;
-        const pow = vars.pow;
+        // Make all variables directly available
+        ${Object.keys(contextVars).map(key => `const ${key} = vars.${key};`).join('\n        ')}
         try {
           const result = ${processedEquation};
           return isFinite(result) ? result : 0;

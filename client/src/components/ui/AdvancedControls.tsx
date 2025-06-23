@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Button } from './button';
 import { Slider } from './slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { Badge } from './badge';
 import { Separator } from './separator';
 import { useSurfaceControls } from '../../lib/stores/useSurfaceControls';
-import { Calculator, Edit3 } from 'lucide-react';
+import { Calculator, Edit3, Minus, Maximize2 } from 'lucide-react';
 
 export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference' | 'laplace' | 'fourier' | 'bessel' | 'legendre' | 
   'mandelbrot' | 'julia' | 'newton' | 'barnsley' | 'lorenz' | 'rossler' | 'chua' | 'henon' | 'logistic' | 'bifurcation' | 
@@ -100,19 +100,89 @@ export function AdvancedControls({
   onRandomize,
   onExport
 }: AdvancedControlsProps) {
+  const [position, setPosition] = useState({ x: 20, y: 20 });
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (e.target instanceof HTMLElement && 
+        (e.target.closest('button') || e.target.closest('input') || e.target.closest('[role="slider"]'))) {
+      return;
+    }
+    
+    setIsDragging(true);
+    setDragStart({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
+    });
+  }, [position]);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging) return;
+    
+    const newX = Math.max(0, Math.min(window.innerWidth - 350, e.clientX - dragStart.x));
+    const newY = Math.max(0, Math.min(window.innerHeight - 60, e.clientY - dragStart.y));
+    
+    setPosition({ x: newX, y: newY });
+  }, [isDragging, dragStart]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  React.useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp]);
   const { setShowEquationEditor } = useSurfaceControls();
   
   return (
-    <Card className="absolute top-4 right-4 w-80 max-h-[90vh] overflow-y-auto bg-black/95 border-white/20 text-white rounded-2xl">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Mathematical Surface Control</CardTitle>
-          <Badge variant="outline" className="text-xs rounded-full">
-            Advanced
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <div 
+      ref={cardRef}
+      className="absolute w-80 z-20"
+      style={{
+        left: position.x,
+        top: position.y,
+        cursor: isDragging ? 'grabbing' : 'default'
+      }}
+    >
+      <Card className="bg-black/95 border-white/20 text-white rounded-2xl backdrop-blur-sm">
+        <CardHeader 
+          className="pb-3 cursor-grab active:cursor-grabbing select-none"
+          onMouseDown={handleMouseDown}
+        >
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Calculator className="w-5 h-5 text-blue-400" />
+              Mathematical Surface Control
+              <Badge variant="outline" className="text-xs rounded-full">
+                Advanced
+              </Badge>
+            </CardTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMinimized(!isMinimized)}
+              className="h-6 w-6 p-0 hover:bg-gray-700"
+            >
+              {isMinimized ? (
+                <Maximize2 className="h-3 w-3" />
+              ) : (
+                <Minus className="h-3 w-3" />
+              )}
+            </Button>
+          </div>
+        </CardHeader>
+        {!isMinimized && (
+          <CardContent className="space-y-6 max-h-96 overflow-y-auto">
         
         {/* Mathematical Function */}
         <div className="space-y-3">
@@ -418,7 +488,9 @@ export function AdvancedControls({
             Reset All
           </Button>
         </div>
-      </CardContent>
-    </Card>
+          </CardContent>
+        )}
+      </Card>
+    </div>
   );
 }
