@@ -83,7 +83,7 @@ const defaultValues = {
   showGrid: false,
   autoRotate: false,
   showEquations: true,
-  customEquation: 'A * sin(x * f + t * s) + A * cos(z * f + t * s * 0.7)',
+  customEquation: '2 * sin(x * 0.5 + t) + cos(z * 0.3 + t * 0.8)',
   equationVariables: {
     A: 2.0,
     f: 0.8,

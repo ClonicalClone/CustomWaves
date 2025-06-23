@@ -70,7 +70,7 @@ export function AdvancedEquationEditor({
   const [previewMode, setPreviewMode] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
 
-  // Debounced equation validation and application
+  // Debounced equation validation only - no auto-apply
   useEffect(() => {
     const timer = setTimeout(() => {
       if (currentEquation.trim()) {
@@ -81,12 +81,6 @@ export function AdvancedEquationEditor({
             setSyntaxError('Unbalanced parentheses');
           } else {
             setSyntaxError('');
-            // Only apply if in preview mode or if equation is significantly different
-            if (previewMode && currentEquation !== equation) {
-              setIsApplying(true);
-              onEquationChange(currentEquation);
-              setTimeout(() => setIsApplying(false), 300);
-            }
           }
         } catch (e) {
           setSyntaxError('Invalid syntax');
@@ -94,10 +88,10 @@ export function AdvancedEquationEditor({
       } else {
         setSyntaxError('');
       }
-    }, 500); // 500ms debounce delay
+    }, 200); // Faster validation
 
     return () => clearTimeout(timer);
-  }, [currentEquation, equation, onEquationChange, previewMode]);
+  }, [currentEquation]);
 
   const checkBalancedParentheses = (str: string): boolean => {
     let count = 0;
@@ -223,12 +217,15 @@ export function AdvancedEquationEditor({
                 {/* Control Buttons */}
                 <div className="flex gap-2">
                   <Button
-                    onClick={() => setPreviewMode(!previewMode)}
-                    variant={previewMode ? "default" : "outline"}
-                    className={`flex-1 h-8 text-xs ${previewMode ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-700 border-gray-600 hover:bg-gray-600'}`}
-                    disabled={isApplying || !!syntaxError}
+                    onClick={() => {
+                      if (!syntaxError && currentEquation.trim()) {
+                        onEquationChange(currentEquation);
+                      }
+                    }}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 h-8 text-xs"
+                    disabled={!!syntaxError || !currentEquation.trim()}
                   >
-                    {isApplying ? 'Applying...' : previewMode ? 'Live Preview ON' : 'Live Preview OFF'}
+                    Apply Equation
                   </Button>
                   <Button
                     onClick={() => navigator.clipboard.writeText(currentEquation)}
@@ -262,7 +259,7 @@ export function AdvancedEquationEditor({
                   <p className="text-red-400 text-xs">{syntaxError}</p>
                 )}
                 <p className="text-gray-400 text-xs">
-                  {previewMode ? "Live Preview: Changes apply automatically" : "Manual Mode: Click Apply to see changes"}
+                  Click "Apply Equation" to update the surface visualization
                 </p>
               </div>
               

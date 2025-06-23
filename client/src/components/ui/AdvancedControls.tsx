@@ -106,42 +106,44 @@ export function AdvancedControls({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
 
+  const dragStateRef = useRef({ isDragging: false, dragStart: { x: 0, y: 0 } });
+
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (e.target instanceof HTMLElement && 
         (e.target.closest('button') || e.target.closest('input') || e.target.closest('[role="slider"]'))) {
       return;
     }
     
-    setIsDragging(true);
-    setDragStart({
+    dragStateRef.current.isDragging = true;
+    dragStateRef.current.dragStart = {
       x: e.clientX - position.x,
       y: e.clientY - position.y
-    });
+    };
+    setIsDragging(true);
   }, [position]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging) return;
+    if (!dragStateRef.current.isDragging) return;
     
-    const newX = Math.max(0, Math.min(window.innerWidth - 350, e.clientX - dragStart.x));
-    const newY = Math.max(0, Math.min(window.innerHeight - 60, e.clientY - dragStart.y));
+    const newX = Math.max(0, Math.min(window.innerWidth - 350, e.clientX - dragStateRef.current.dragStart.x));
+    const newY = Math.max(0, Math.min(window.innerHeight - 60, e.clientY - dragStateRef.current.dragStart.y));
     
     setPosition({ x: newX, y: newY });
-  }, [isDragging, dragStart]);
+  }, []);
 
   const handleMouseUp = useCallback(() => {
+    dragStateRef.current.isDragging = false;
     setIsDragging(false);
   }, []);
 
   React.useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [handleMouseMove, handleMouseUp]);
   const { setShowEquationEditor } = useSurfaceControls();
   
   return (
