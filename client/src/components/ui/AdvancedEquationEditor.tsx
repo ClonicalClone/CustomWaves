@@ -68,25 +68,36 @@ export function AdvancedEquationEditor({
   const [newVarValue, setNewVarValue] = useState(1);
   const [syntaxError, setSyntaxError] = useState('');
   const [previewMode, setPreviewMode] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
 
-  // Validate equation syntax
+  // Debounced equation validation and application
   useEffect(() => {
-    if (currentEquation.trim()) {
-      try {
-        // Simple validation - check for balanced parentheses and basic syntax
-        const balanced = checkBalancedParentheses(currentEquation);
-        if (!balanced) {
-          setSyntaxError('Unbalanced parentheses');
-        } else {
-          setSyntaxError('');
+    const timer = setTimeout(() => {
+      if (currentEquation.trim()) {
+        try {
+          // Simple validation - check for balanced parentheses and basic syntax
+          const balanced = checkBalancedParentheses(currentEquation);
+          if (!balanced) {
+            setSyntaxError('Unbalanced parentheses');
+          } else {
+            setSyntaxError('');
+            // Only apply if in preview mode or if equation is significantly different
+            if (previewMode && currentEquation !== equation) {
+              setIsApplying(true);
+              onEquationChange(currentEquation);
+              setTimeout(() => setIsApplying(false), 300);
+            }
+          }
+        } catch (e) {
+          setSyntaxError('Invalid syntax');
         }
-      } catch (e) {
-        setSyntaxError('Invalid syntax');
+      } else {
+        setSyntaxError('');
       }
-    } else {
-      setSyntaxError('');
-    }
-  }, [currentEquation]);
+    }, 500); // 500ms debounce delay
+
+    return () => clearTimeout(timer);
+  }, [currentEquation, equation, onEquationChange, previewMode]);
 
   const checkBalancedParentheses = (str: string): boolean => {
     let count = 0;
@@ -209,25 +220,23 @@ export function AdvancedEquationEditor({
                   </Select>
                 </div>
                 
-                {/* Preview/Apply Buttons */}
+                {/* Control Buttons */}
                 <div className="flex gap-2">
                   <Button
-                    onClick={handlePreview}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 text-xs h-8"
+                    onClick={() => setPreviewMode(!previewMode)}
+                    variant={previewMode ? "default" : "outline"}
+                    className={`flex-1 h-8 text-xs ${previewMode ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-700 border-gray-600 hover:bg-gray-600'}`}
+                    disabled={isApplying || !!syntaxError}
                   >
-                    <RefreshCw className="w-3 h-3 mr-1" />
-                    Preview
+                    {isApplying ? 'Applying...' : previewMode ? 'Live Preview ON' : 'Live Preview OFF'}
                   </Button>
                   <Button
                     onClick={() => navigator.clipboard.writeText(currentEquation)}
                     variant="outline"
                     size="sm"
-                    className="flex-1 text-xs h-8"
+                    className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 text-xs"
                   >
-                    <Copy className="w-3 h-3 mr-1" />
-                    Copy
+                    <Copy className="w-3 h-3" />
                   </Button>
                 </div>
               </div>
@@ -235,16 +244,26 @@ export function AdvancedEquationEditor({
               {/* Equation Input */}
               <div className="space-y-2">
                 <Label className="text-xs">Equation (x, z = position, t = time)</Label>
-                <Textarea
-                  id="equation-input"
-                  value={currentEquation}
-                  onChange={(e) => setCurrentEquation(e.target.value)}
-                  placeholder="Enter mathematical equation..."
-                  className="h-20 bg-gray-800 border-gray-600 font-mono text-xs resize-none"
-                />
+                <div className="relative">
+                  <Textarea
+                    id="equation-input"
+                    value={currentEquation}
+                    onChange={(e) => setCurrentEquation(e.target.value)}
+                    placeholder="Enter mathematical equation..."
+                    className="h-20 bg-gray-800 border-gray-600 font-mono text-xs resize-none"
+                  />
+                  {isApplying && (
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                      <div className="text-xs text-white">Applying...</div>
+                    </div>
+                  )}
+                </div>
                 {syntaxError && (
                   <p className="text-red-400 text-xs">{syntaxError}</p>
                 )}
+                <p className="text-gray-400 text-xs">
+                  {previewMode ? "Live Preview: Changes apply automatically" : "Manual Mode: Click Apply to see changes"}
+                </p>
               </div>
               
               {/* Quick Insert Buttons */}

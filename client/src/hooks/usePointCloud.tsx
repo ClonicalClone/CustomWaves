@@ -358,7 +358,10 @@ export function usePointCloud({
       case 'custom':
         if (customEquation) {
           try {
-            return evaluateCustomEquation(customEquation, x, z, timeSpeed, equationVariables) + mouseEffect;
+            const result = evaluateCustomEquation(customEquation, x, z, timeSpeed, equationVariables);
+            // Clamp result to prevent extreme values that could cause performance issues
+            const clampedResult = Math.max(-100, Math.min(100, result));
+            return clampedResult * amplitude + mouseEffect;
           } catch (e) {
             console.warn('Custom equation evaluation failed:', e);
             return mouseEffect;
@@ -440,7 +443,10 @@ export function usePointCloud({
   };
 }
 
-// Custom equation evaluator
+// Cached equation evaluator for performance
+const equationCache = new Map<string, Function>();
+const invalidEquations = new Set<string>();
+
 function evaluateCustomEquation(
   equation: string, 
   x: number, 
@@ -448,43 +454,107 @@ function evaluateCustomEquation(
   t: number, 
   variables: Record<string, number>
 ): number {
-  // Create a safe evaluation context
-  const context = {
-    x, z, t,
-    sin: Math.sin,
-    cos: Math.cos,
-    tan: Math.tan,
-    atan: Math.atan,
-    exp: Math.exp,
-    log: Math.log,
-    sqrt: Math.sqrt,
-    abs: Math.abs,
-    pow: Math.pow,
-    sinh: Math.sinh,
-    cosh: Math.cosh,
-    tanh: Math.tanh,
-    ...variables
-  };
+  // Early return for known invalid equations
+  if (invalidEquations.has(equation)) {
+    return 0;
+  }
+
+  // Create cache key including variable values for context changes
+  const cacheKey = `${equation}|${JSON.stringify(variables)}`;
   
-  // Simple and safe equation parser
-  let processedEquation = equation;
+  let evaluatorFunc = equationCache.get(cacheKey);
   
-  // Replace mathematical constants and functions
-  Object.keys(context).forEach(key => {
-    const regex = new RegExp(`\\b${key}\\b`, 'g');
-    processedEquation = processedEquation.replace(regex, `context.${key}`);
-  });
-  
-  // Replace common mathematical operators
-  processedEquation = processedEquation.replace(/\^/g, '**');
+  if (!evaluatorFunc) {
+    try {
+      // Create a safe evaluation context
+      const contextVars = {
+        sin: Math.sin,
+        cos: Math.cos,
+        tan: Math.tan,
+        atan: Math.atan,
+        atan2: Math.atan2,
+        exp: Math.exp,
+        log: Math.log,
+        sqrt: Math.sqrt,
+        abs: Math.abs,
+        pow: Math.pow,
+        sinh: Math.sinh,
+        cosh: Math.cosh,
+        tanh: Math.tanh,
+        min: Math.min,
+        max: Math.max,
+        PI: Math.PI,
+        E: Math.E,
+        ...variables
+      };
+      
+      // Simple and safe equation parser
+      let processedEquation = equation.trim();
+      
+      // Basic safety checks
+      if (processedEquation.includes('while') || 
+          processedEquation.includes('for') || 
+          processedEquation.includes('eval') ||
+          processedEquation.includes('Function')) {
+        throw new Error('Unsafe equation detected');
+      }
+      
+      // Replace mathematical operators
+      processedEquation = processedEquation.replace(/\^/g, '**');
+      
+      // Replace variables and functions with safe context access
+      Object.keys(contextVars).forEach(key => {
+        const regex = new RegExp(`\\b${key}\\b`, 'g');
+        processedEquation = processedEquation.replace(regex, `vars.${key}`);
+      });
+      
+      // Create the evaluation function
+      const funcBody = `
+        const vars = arguments[3];
+        const x = arguments[0];
+        const z = arguments[1]; 
+        const t = arguments[2];
+        try {
+          const result = ${processedEquation};
+          return isFinite(result) ? result : 0;
+        } catch (e) {
+          return 0;
+        }
+      `;
+      
+      evaluatorFunc = new Function(funcBody);
+      
+      // Test the function with sample values
+      const testResult = evaluatorFunc(0, 0, 0, contextVars);
+      if (!isFinite(testResult)) {
+        throw new Error('Function produces invalid results');
+      }
+      
+      // Cache the successful function
+      equationCache.set(cacheKey, evaluatorFunc);
+      
+      // Limit cache size
+      if (equationCache.size > 50) {
+        const firstKey = equationCache.keys().next().value;
+        equationCache.delete(firstKey);
+      }
+      
+    } catch (error) {
+      console.warn('Equation compilation failed:', error);
+      invalidEquations.add(equation);
+      return 0;
+    }
+  }
   
   try {
-    // Use Function constructor for safe evaluation
-    const func = new Function('context', `with(context) { return ${processedEquation}; }`);
-    const result = func(context);
-    return isNaN(result) ? 0 : result;
+    const result = evaluatorFunc(x, z, t, {
+      sin: Math.sin, cos: Math.cos, tan: Math.tan, atan: Math.atan, atan2: Math.atan2,
+      exp: Math.exp, log: Math.log, sqrt: Math.sqrt, abs: Math.abs, pow: Math.pow,
+      sinh: Math.sinh, cosh: Math.cosh, tanh: Math.tanh, min: Math.min, max: Math.max,
+      PI: Math.PI, E: Math.E, ...variables
+    });
+    return isFinite(result) ? result : 0;
   } catch (error) {
-    console.warn('Equation evaluation failed:', error);
     return 0;
   }
 }
