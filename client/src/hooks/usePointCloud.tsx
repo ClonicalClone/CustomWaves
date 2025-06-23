@@ -356,11 +356,12 @@ export function usePointCloud({
       
       // Custom equation support
       case 'custom':
-        if (customEquation && customEquation.trim()) {
+        if (customEquation) {
           try {
             const result = evaluateCustomEquation(customEquation, x, z, timeSpeed, equationVariables);
-            // Don't multiply by amplitude again since it's already in the equation variables
-            return isFinite(result) ? result + mouseEffect : mouseEffect;
+            // Clamp result to prevent extreme values that could cause performance issues
+            const clampedResult = Math.max(-100, Math.min(100, result));
+            return clampedResult * amplitude + mouseEffect;
           } catch (e) {
             console.warn('Custom equation evaluation failed:', e);
             return mouseEffect;
@@ -458,13 +459,35 @@ function evaluateCustomEquation(
     return 0;
   }
 
-  // Simple cache key based on equation only (variables are passed each time)
-  const cacheKey = equation.trim();
+  // Create cache key including variable values for context changes
+  const cacheKey = `${equation}|${JSON.stringify(variables)}`;
   
   let evaluatorFunc = equationCache.get(cacheKey);
   
   if (!evaluatorFunc) {
     try {
+      // Create a safe evaluation context
+      const contextVars = {
+        sin: Math.sin,
+        cos: Math.cos,
+        tan: Math.tan,
+        atan: Math.atan,
+        atan2: Math.atan2,
+        exp: Math.exp,
+        log: Math.log,
+        sqrt: Math.sqrt,
+        abs: Math.abs,
+        pow: Math.pow,
+        sinh: Math.sinh,
+        cosh: Math.cosh,
+        tanh: Math.tanh,
+        min: Math.min,
+        max: Math.max,
+        PI: Math.PI,
+        E: Math.E,
+        ...variables
+      };
+      
       // Simple and safe equation parser
       let processedEquation = equation.trim();
       
@@ -478,32 +501,31 @@ function evaluateCustomEquation(
       
       // Replace mathematical operators
       processedEquation = processedEquation.replace(/\^/g, '**');
-      processedEquation = processedEquation.replace(/π/g, 'PI');
-      processedEquation = processedEquation.replace(/φ/g, 'phi');
       
-      // Create safer evaluation using with statement
+      // Replace variables and functions with safe context access
+      Object.keys(contextVars).forEach(key => {
+        const regex = new RegExp(`\\b${key}\\b`, 'g');
+        processedEquation = processedEquation.replace(regex, `vars.${key}`);
+      });
+      
+      // Create the evaluation function
       const funcBody = `
-        return function(x, z, t, vars) {
-          with(vars) {
-            try {
-              return ${processedEquation};
-            } catch (e) {
-              return 0;
-            }
-          }
-        };
+        const vars = arguments[3];
+        const x = arguments[0];
+        const z = arguments[1]; 
+        const t = arguments[2];
+        try {
+          const result = ${processedEquation};
+          return isFinite(result) ? result : 0;
+        } catch (e) {
+          return 0;
+        }
       `;
       
-      evaluatorFunc = new Function(funcBody)();
+      evaluatorFunc = new Function(funcBody);
       
       // Test the function with sample values
-      const testVars = {
-        sin: Math.sin, cos: Math.cos, tan: Math.tan, atan: Math.atan, atan2: Math.atan2,
-        exp: Math.exp, log: Math.log, sqrt: Math.sqrt, abs: Math.abs, pow: Math.pow,
-        sinh: Math.sinh, cosh: Math.cosh, tanh: Math.tanh, min: Math.min, max: Math.max,
-        PI: Math.PI, E: Math.E, phi: 1.618033988749, ...variables
-      };
-      const testResult = evaluatorFunc(0, 0, 0, testVars);
+      const testResult = evaluatorFunc(0, 0, 0, contextVars);
       if (!isFinite(testResult)) {
         throw new Error('Function produces invalid results');
       }
@@ -525,13 +547,12 @@ function evaluateCustomEquation(
   }
   
   try {
-    const context = {
+    const result = evaluatorFunc(x, z, t, {
       sin: Math.sin, cos: Math.cos, tan: Math.tan, atan: Math.atan, atan2: Math.atan2,
       exp: Math.exp, log: Math.log, sqrt: Math.sqrt, abs: Math.abs, pow: Math.pow,
       sinh: Math.sinh, cosh: Math.cosh, tanh: Math.tanh, min: Math.min, max: Math.max,
-      PI: Math.PI, E: Math.E, phi: 1.618033988749, ...variables
-    };
-    const result = evaluatorFunc(x, z, t, context);
+      PI: Math.PI, E: Math.E, ...variables
+    });
     return isFinite(result) ? result : 0;
   } catch (error) {
     return 0;

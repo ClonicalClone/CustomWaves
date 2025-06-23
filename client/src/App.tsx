@@ -1,13 +1,10 @@
-import React, { Suspense, useState } from 'react';
+import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import Scene from './components/Scene';
 import { AdvancedControls } from './components/ui/AdvancedControls';
 import { EditableEquation } from './components/ui/EditableEquation';
 import { AdvancedEquationEditor } from './components/ui/AdvancedEquationEditor';
-import { DraggablePanel } from './components/ui/DraggablePanel';
 import { useSurfaceControls } from './lib/stores/useSurfaceControls';
-import { Button } from './components/ui/button';
-import { Settings, Calculator, FileText } from 'lucide-react';
 import './index.css';
 
 // Comprehensive Mathematical Equation Definitions - 50+ Concepts
@@ -442,9 +439,6 @@ const equations: Record<string, { title: string; equation: string; category: str
 };
 
 function App() {
-  const [showControls, setShowControls] = useState(true);
-  const [showEquationDisplay, setShowEquationDisplay] = useState(true);
-  
   const {
     mathFunction,
     amplitude,
@@ -523,76 +517,58 @@ function App() {
         </Suspense>
       </Canvas>
       
-      {/* Left side controls - draggable version of original layout */}
-      <DraggablePanel
-        title="Advanced Controls"
-        initialPosition={{ x: 20, y: 20 }}
-        onClose={() => {}}
-        defaultMinimized={false}
-        className="w-80"
-      >
-        <AdvancedControls
-          mathFunction={mathFunction}
-          amplitude={amplitude}
-          frequency={frequency}
-          speed={speed}
-          complexity={complexity}
-          colorMode={colorMode}
-          pointSize={pointSize}
-          resolution={resolution}
-          mouseInfluence={mouseInfluence}
-          animationMode={animationMode}
-          turbulence={turbulence}
-          damping={damping}
-          showTrails={showTrails}
-          showGrid={showGrid}
-          autoRotate={autoRotate}
-          onMathFunctionChange={setMathFunction}
-          onAmplitudeChange={setAmplitude}
-          onFrequencyChange={setFrequency}
-          onSpeedChange={setSpeed}
-          onComplexityChange={setComplexity}
-          onColorModeChange={setColorMode}
-          onPointSizeChange={setPointSize}
-          onResolutionChange={setResolution}
-          onMouseInfluenceChange={setMouseInfluence}
-          onAnimationModeChange={setAnimationMode}
-          onTurbulenceChange={setTurbulence}
-          onDampingChange={setDamping}
-          onShowTrailsChange={setShowTrails}
-          onShowGridChange={setShowGrid}
-          onAutoRotateChange={setAutoRotate}
-          onReset={reset}
-          onRandomize={randomize}
-          onExport={handleExport}
-        />
-      </DraggablePanel>
+      <AdvancedControls
+        mathFunction={mathFunction}
+        amplitude={amplitude}
+        frequency={frequency}
+        speed={speed}
+        complexity={complexity}
+        colorMode={colorMode}
+        pointSize={pointSize}
+        resolution={resolution}
+        mouseInfluence={mouseInfluence}
+        animationMode={animationMode}
+        turbulence={turbulence}
+        damping={damping}
+        showTrails={showTrails}
+        showGrid={showGrid}
+        autoRotate={autoRotate}
+        onMathFunctionChange={setMathFunction}
+        onAmplitudeChange={setAmplitude}
+        onFrequencyChange={setFrequency}
+        onSpeedChange={setSpeed}
+        onComplexityChange={setComplexity}
+        onColorModeChange={setColorMode}
+        onPointSizeChange={setPointSize}
+        onResolutionChange={setResolution}
+        onMouseInfluenceChange={setMouseInfluence}
+        onAnimationModeChange={setAnimationMode}
+        onTurbulenceChange={setTurbulence}
+        onDampingChange={setDamping}
+        onShowTrailsChange={setShowTrails}
+        onShowGridChange={setShowGrid}
+        onAutoRotateChange={setAutoRotate}
+        onReset={reset}
+        onRandomize={randomize}
+        onExport={handleExport}
+      />
       
-      {/* Right side equation display - draggable version of original layout */}
-      <DraggablePanel
-        title="Equation Display"
-        initialPosition={{ x: window.innerWidth - 420, y: 20 }}
-        onClose={() => {}}
-        defaultMinimized={false}
-        className="w-96"
-      >
-        <EditableEquation
-          equation={equations[mathFunction]?.equation || customEquation}
-          title={equations[mathFunction]?.title || "Custom Equation"}
-          category={equations[mathFunction]?.category || "User-Defined"}
-          concept={equations[mathFunction]?.concept || "Custom mathematical expression"}
-          onEquationChange={(newEquation: string) => {
-            if (mathFunction === 'custom') {
-              setCustomEquation(newEquation);
-            } else {
-              setMathFunction('custom');
-              setCustomEquation(newEquation);
-            }
-          }}
-        />
-      </DraggablePanel>
+      {/* Always show equations display */}
+      <EditableEquation
+        equation={equations[mathFunction]?.equation || customEquation}
+        title={equations[mathFunction]?.title || "Custom Equation"}
+        category={equations[mathFunction]?.category || "User-Defined"}
+        concept={equations[mathFunction]?.concept || "Custom mathematical expression"}
+        onEquationChange={(newEquation: string) => {
+          if (mathFunction === 'custom') {
+            setCustomEquation(newEquation);
+          } else {
+            setMathFunction('custom');
+            setCustomEquation(newEquation);
+          }
+        }}
+      />
       
-      {/* Equation Editor Modal */}
       {showEquationEditor && (
         <AdvancedEquationEditor
           equation={customEquation}
