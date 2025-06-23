@@ -169,8 +169,8 @@ export function AdvancedEquationEditor({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-4xl max-h-[90vh] bg-gray-900 border-gray-700 text-white overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2">
+      <Card className="w-full max-w-5xl max-h-[95vh] bg-gray-900 border-gray-700 text-white overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between pb-4">
           <CardTitle className="text-xl flex items-center gap-2">
             <Calculator className="w-5 h-5" />
@@ -181,141 +181,129 @@ export function AdvancedEquationEditor({
           </Button>
         </CardHeader>
         
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 p-4">
           <Tabs defaultValue="editor" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 bg-gray-800">
-              <TabsTrigger value="editor">Editor</TabsTrigger>
-              <TabsTrigger value="variables">Variables</TabsTrigger>
-              <TabsTrigger value="functions">Functions</TabsTrigger>
-              <TabsTrigger value="help">Help</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-4 bg-gray-800 h-8">
+              <TabsTrigger value="editor" className="text-xs">Editor</TabsTrigger>
+              <TabsTrigger value="variables" className="text-xs">Variables</TabsTrigger>
+              <TabsTrigger value="functions" className="text-xs">Functions</TabsTrigger>
+              <TabsTrigger value="help" className="text-xs">Help</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="editor" className="space-y-4">
-              {/* Template Selection */}
-              <div className="space-y-2">
-                <Label>Equation Templates</Label>
-                <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
-                  <SelectTrigger className="bg-gray-800 border-gray-600">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-600">
-                    {Object.keys(equationTemplates).map(template => (
-                      <SelectItem key={template} value={template}>
-                        {template}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <TabsContent value="editor" className="space-y-3">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {/* Template Selection */}
+                <div className="space-y-2">
+                  <Label className="text-xs">Templates</Label>
+                  <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
+                    <SelectTrigger className="bg-gray-800 border-gray-600 h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-600 max-h-48">
+                      {Object.keys(equationTemplates).map(template => (
+                        <SelectItem key={template} value={template} className="text-xs">
+                          {template}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Preview/Apply Buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handlePreview}
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 text-xs h-8"
+                  >
+                    <RefreshCw className="w-3 h-3 mr-1" />
+                    Preview
+                  </Button>
+                  <Button
+                    onClick={() => navigator.clipboard.writeText(currentEquation)}
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 text-xs h-8"
+                  >
+                    <Copy className="w-3 h-3 mr-1" />
+                    Copy
+                  </Button>
+                </div>
               </div>
               
               {/* Equation Input */}
               <div className="space-y-2">
-                <Label>Equation (use variables: x, z, t for position and time)</Label>
+                <Label className="text-xs">Equation (x, z = position, t = time)</Label>
                 <Textarea
                   id="equation-input"
                   value={currentEquation}
                   onChange={(e) => setCurrentEquation(e.target.value)}
-                  placeholder="Enter your mathematical equation..."
-                  className="min-h-24 bg-gray-800 border-gray-600 font-mono text-sm"
+                  placeholder="Enter mathematical equation..."
+                  className="h-20 bg-gray-800 border-gray-600 font-mono text-xs resize-none"
                 />
                 {syntaxError && (
-                  <p className="text-red-400 text-sm">{syntaxError}</p>
+                  <p className="text-red-400 text-xs">{syntaxError}</p>
                 )}
               </div>
               
               {/* Quick Insert Buttons */}
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => insertConstant('pi')}
-                  className="text-xs"
-                >
-                  π
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => insertConstant('e')}
-                  className="text-xs"
-                >
-                  e
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => insertConstant('phi')}
-                  className="text-xs"
-                >
-                  φ
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => insertFunction('sin')}
-                  className="text-xs"
-                >
-                  sin()
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => insertFunction('cos')}
-                  className="text-xs"
-                >
-                  cos()
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => insertFunction('exp')}
-                  className="text-xs"
-                >
-                  exp()
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => insertFunction('sqrt')}
-                  className="text-xs"
-                >
-                  sqrt()
-                </Button>
+              <div className="grid grid-cols-4 lg:grid-cols-8 gap-1">
+                {['π', 'e', 'φ', '√2'].map(const => (
+                  <Button
+                    key={const}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => insertConstant(const === 'π' ? 'pi' : const === 'φ' ? 'phi' : const === '√2' ? 'sqrt2' : 'e')}
+                    className="text-xs h-7 p-1"
+                  >
+                    {const}
+                  </Button>
+                ))}
+                {['sin', 'cos', 'exp', 'sqrt'].map(func => (
+                  <Button
+                    key={func}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => insertFunction(func)}
+                    className="text-xs h-7 p-1"
+                  >
+                    {func}()
+                  </Button>
+                ))}
               </div>
             </TabsContent>
             
-            <TabsContent value="variables" className="space-y-4">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Variable Controls</h3>
+            <TabsContent value="variables" className="space-y-3">
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold">Variable Controls</h3>
                 
                 {/* Add New Variable */}
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Variable name"
+                    placeholder="Name"
                     value={newVarName}
                     onChange={(e) => setNewVarName(e.target.value)}
-                    className="bg-gray-800 border-gray-600"
+                    className="bg-gray-800 border-gray-600 h-8 text-xs"
                   />
                   <Input
                     type="number"
                     placeholder="Value"
                     value={newVarValue}
                     onChange={(e) => setNewVarValue(parseFloat(e.target.value) || 0)}
-                    className="bg-gray-800 border-gray-600"
+                    className="bg-gray-800 border-gray-600 h-8 text-xs"
                   />
-                  <Button onClick={handleAddVariable} size="sm">
-                    <Plus className="w-4 h-4" />
+                  <Button onClick={handleAddVariable} size="sm" className="h-8 px-2">
+                    <Plus className="w-3 h-3" />
                   </Button>
                 </div>
                 
-                <Separator className="bg-gray-700" />
-                
                 {/* Variable List */}
-                <ScrollArea className="h-64">
-                  <div className="space-y-3">
+                <ScrollArea className="h-60">
+                  <div className="space-y-2">
                     {Object.entries(variables).map(([name, value]) => (
-                      <div key={name} className="flex items-center gap-3 p-3 bg-gray-800 rounded">
-                        <Badge variant="outline" className="font-mono">
+                      <div key={name} className="flex items-center gap-2 p-2 bg-gray-800 rounded text-xs">
+                        <Badge variant="outline" className="font-mono text-xs min-w-12">
                           {name}
                         </Badge>
                         <div className="flex-1">
@@ -330,16 +318,16 @@ export function AdvancedEquationEditor({
                         </div>
                         <Input
                           type="number"
-                          value={value}
+                          value={value.toFixed(2)}
                           onChange={(e) => onVariableChange(name, parseFloat(e.target.value) || 0)}
-                          className="w-20 bg-gray-700 border-gray-600 text-xs"
+                          className="w-16 bg-gray-700 border-gray-600 text-xs h-6"
                           step={0.1}
                         />
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleRemoveVariable(name)}
-                          className="text-red-400 hover:text-red-300"
+                          className="text-red-400 hover:text-red-300 h-6 w-6 p-0"
                         >
                           <Trash2 className="w-3 h-3" />
                         </Button>
@@ -350,40 +338,43 @@ export function AdvancedEquationEditor({
               </div>
             </TabsContent>
             
-            <TabsContent value="functions" className="space-y-4">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Mathematical Functions</h3>
-                
-                <div className="grid grid-cols-3 gap-2">
-                  {mathFunctions.map(func => (
-                    <Button
-                      key={func}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => insertFunction(func)}
-                      className="text-xs justify-start"
-                    >
-                      {func}()
-                    </Button>
-                  ))}
-                </div>
-                
-                <Separator className="bg-gray-700" />
-                
-                <h4 className="font-semibold">Constants</h4>
-                <div className="grid grid-cols-3 gap-2">
-                  {Object.entries(mathConstants).map(([name, value]) => (
-                    <Button
-                      key={name}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => insertConstant(name)}
-                      className="text-xs justify-start"
-                      title={`${name} = ${value.toFixed(6)}`}
-                    >
-                      {name}
-                    </Button>
-                  ))}
+            <TabsContent value="functions" className="space-y-3">
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Functions</h4>
+                    <div className="grid grid-cols-3 gap-1">
+                      {mathFunctions.map(func => (
+                        <Button
+                          key={func}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => insertFunction(func)}
+                          className="text-xs h-7 p-1"
+                        >
+                          {func}()
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Constants</h4>
+                    <div className="grid grid-cols-2 gap-1">
+                      {Object.entries(mathConstants).map(([name, value]) => (
+                        <Button
+                          key={name}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => insertConstant(name)}
+                          className="text-xs h-7 p-1"
+                          title={`${name} = ${value.toFixed(6)}`}
+                        >
+                          {name}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </TabsContent>
@@ -439,37 +430,22 @@ export function AdvancedEquationEditor({
           </Tabs>
           
           {/* Action Buttons */}
-          <div className="flex justify-between pt-4 border-t border-gray-700">
+          <div className="flex justify-between pt-3 border-t border-gray-700">
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={handlePreview}
-                className="flex items-center gap-2"
-              >
-                <RefreshCw className="w-4 h-4" />
-                Preview
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => navigator.clipboard.writeText(currentEquation)}
-                className="flex items-center gap-2"
-              >
-                <Copy className="w-4 h-4" />
-                Copy
+              <Button variant="outline" onClick={onClose} size="sm" className="h-8 text-xs">
+                Cancel
               </Button>
             </div>
             
             <div className="flex gap-2">
-              <Button variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
               <Button 
                 onClick={handleSave} 
                 disabled={!!syntaxError}
-                className="flex items-center gap-2"
+                size="sm"
+                className="h-8 text-xs flex items-center gap-1"
               >
-                <Save className="w-4 h-4" />
-                Apply
+                <Save className="w-3 h-3" />
+                Apply & Close
               </Button>
             </div>
           </div>

@@ -33,16 +33,19 @@ export function EditableEquation({
   };
 
   return (
-    <Card className="bg-gray-900/95 border-gray-700 text-white rounded-2xl">
-      <CardHeader className="pb-3">
+    <Card className="absolute bottom-4 left-4 w-96 max-h-80 bg-black/95 border-white/20 text-white rounded-2xl overflow-hidden">
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">{title}</CardTitle>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <span className="text-blue-400">∑</span>
+            {title}
+          </CardTitle>
           <Badge variant="outline" className="text-xs rounded-full">
             {category}
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 overflow-y-auto max-h-60">
         {/* Equation Display/Editor */}
         <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-600">
           {isEditing ? (
