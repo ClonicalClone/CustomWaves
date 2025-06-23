@@ -89,8 +89,8 @@ const defaultValues = {
     f: 0.8,
     s: 1.2,
     c: 1.0,
-    pi: Math.PI,
-    e: Math.E,
+    PI: Math.PI,
+    E: Math.E,
     phi: 1.618033988749,
     sqrt2: Math.sqrt(2),
     sqrt3: Math.sqrt(3)
