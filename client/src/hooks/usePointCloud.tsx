@@ -136,9 +136,10 @@ export function usePointCloud({
       case 'bessel':
         // Bessel function approximation
         const besselArg = freq * Math.sqrt(x * x + z * z) - timeSpeed;
+        const besselTheta = Math.atan2(z, x);
         const besselJ0 = Math.cos(besselArg) * Math.exp(-Math.abs(besselArg) * 0.1);
         const besselJ1 = Math.sin(besselArg) * besselArg * Math.exp(-Math.abs(besselArg) * 0.1) * 0.5;
-        const besselModulation = Math.sin(theta * 3 + timeSpeed * 0.8) * 0.2;
+        const besselModulation = Math.sin(besselTheta * 3 + timeSpeed * 0.8) * 0.2;
         return (besselJ0 + besselJ1 + besselModulation) * amplitude + mouseEffect;
       
       case 'legendre':
@@ -377,7 +378,7 @@ export function usePointCloud({
                                  Math.sin(timeSpeed * 0.618) * 0.15; // Golden ratio modulation
         return (waveX + waveZ + crossWave + radialWave + harmonicModulation) * amplitude + mouseEffect;
     }
-  }, [amplitude, frequency, speed, complexity, mathFunction, animationMode, turbulence, mouseInfluence]);
+  }, [amplitude, frequency, speed, complexity, mathFunction, animationMode, turbulence, mouseInfluence, customEquation, equationVariables]);
   
   const updateSurface = useCallback((
     positionArray: Float32Array,
