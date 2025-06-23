@@ -6,8 +6,17 @@ import { Switch } from './switch';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { Badge } from './badge';
 import { Separator } from './separator';
+import { useSurfaceControls } from '../../lib/stores/useSurfaceControls';
+import { Calculator, Edit3 } from 'lucide-react';
 
-export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference' | 'laplace' | 'fourier' | 'bessel' | 'legendre';
+export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference' | 'laplace' | 'fourier' | 'bessel' | 'legendre' | 
+  'mandelbrot' | 'julia' | 'newton' | 'barnsley' | 'lorenz' | 'rossler' | 'chua' | 'henon' | 'logistic' | 'bifurcation' | 
+  'navier_stokes' | 'schrodinger' | 'maxwell' | 'einstein' | 'dirac' | 'klein_gordon' | 'wave_equation' | 'heat_equation' | 
+  'poisson' | 'helmholtz' | 'burgers' | 'kdv' | 'sine_gordon' | 'nonlinear_schrodinger' | 'reaction_diffusion' | 
+  'fibonacci' | 'pascal' | 'catalan' | 'euler_gamma' | 'riemann_zeta' | 'weierstrass' | 'cantor' | 'sierpinski' | 
+  'mobius' | 'torus' | 'hyperbolic' | 'spherical' | 'elliptic' | 'parabolic' | 'geodesic' | 'curvature' | 
+  'quantum_harmonic' | 'quantum_well' | 'hydrogen_atom' | 'phonon' | 'plasmon' | 'soliton' | 'breather' | 'kink' |
+  'cellular_automata' | 'game_of_life' | 'neural_network' | 'genetic_algorithm' | 'percolation' | 'ising_model' | 'custom';
 export type ColorMode = 'height' | 'velocity' | 'gradient' | 'rainbow';
 export type AnimationMode = 'smooth' | 'pulse' | 'chaotic' | 'freeze';
 
@@ -91,6 +100,8 @@ export function AdvancedControls({
   onRandomize,
   onExport
 }: AdvancedControlsProps) {
+  const { setShowEquationEditor } = useSurfaceControls();
+  
   return (
     <Card className="absolute top-4 right-4 w-80 max-h-[90vh] overflow-y-auto bg-black/95 border-white/20 text-white rounded-2xl">
       <CardHeader className="pb-3">
@@ -110,21 +121,94 @@ export function AdvancedControls({
             <SelectTrigger className="bg-gray-800 border-gray-600 rounded-xl">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-600 rounded-xl">
+            <SelectContent className="bg-gray-800 border-gray-600 rounded-xl max-h-64 overflow-y-auto">
+              {/* Wave Theory & Harmonic Analysis */}
               <SelectItem value="waves">Superposition Waves</SelectItem>
               <SelectItem value="sin">Harmonic Sine</SelectItem>
               <SelectItem value="cos">Modulated Cosine</SelectItem>
               <SelectItem value="tan">Arctangent Field</SelectItem>
-              <SelectItem value="electric">Electromagnetic Field</SelectItem>
-              <SelectItem value="ripples">Hydrodynamic Waves</SelectItem>
-              <SelectItem value="spiral">Fibonacci Spiral</SelectItem>
-              <SelectItem value="interference">Double-Slit Interference</SelectItem>
-              <SelectItem value="laplace">Laplace Equation</SelectItem>
               <SelectItem value="fourier">Fourier Series</SelectItem>
+              
+              {/* Electromagnetism & Fields */}
+              <SelectItem value="electric">Electromagnetic Field</SelectItem>
+              <SelectItem value="maxwell">Maxwell Equations</SelectItem>
+              
+              {/* Fluid Dynamics */}
+              <SelectItem value="ripples">Hydrodynamic Waves</SelectItem>
+              <SelectItem value="navier_stokes">Navier-Stokes</SelectItem>
+              
+              {/* Quantum Mechanics */}
+              <SelectItem value="schrodinger">Schrödinger Equation</SelectItem>
+              <SelectItem value="quantum_harmonic">Quantum Harmonic</SelectItem>
+              <SelectItem value="quantum_well">Quantum Well</SelectItem>
+              <SelectItem value="hydrogen_atom">Hydrogen Atom</SelectItem>
+              
+              {/* Fractals & Chaos */}
+              <SelectItem value="mandelbrot">Mandelbrot Set</SelectItem>
+              <SelectItem value="julia">Julia Set</SelectItem>
+              <SelectItem value="newton">Newton Fractal</SelectItem>
+              <SelectItem value="lorenz">Lorenz Attractor</SelectItem>
+              <SelectItem value="rossler">Rössler Attractor</SelectItem>
+              <SelectItem value="henon">Hénon Map</SelectItem>
+              <SelectItem value="logistic">Logistic Map</SelectItem>
+              
+              {/* PDEs */}
+              <SelectItem value="laplace">Laplace Equation</SelectItem>
+              <SelectItem value="wave_equation">Wave Equation</SelectItem>
+              <SelectItem value="heat_equation">Heat Equation</SelectItem>
+              <SelectItem value="poisson">Poisson Equation</SelectItem>
+              <SelectItem value="helmholtz">Helmholtz Equation</SelectItem>
+              <SelectItem value="burgers">Burgers' Equation</SelectItem>
+              <SelectItem value="kdv">Korteweg-de Vries</SelectItem>
+              <SelectItem value="sine_gordon">Sine-Gordon</SelectItem>
+              <SelectItem value="nonlinear_schrodinger">Nonlinear Schrödinger</SelectItem>
+              <SelectItem value="reaction_diffusion">Reaction-Diffusion</SelectItem>
+              
+              {/* Special Functions */}
               <SelectItem value="bessel">Bessel Functions</SelectItem>
               <SelectItem value="legendre">Legendre Polynomials</SelectItem>
+              <SelectItem value="fibonacci">Fibonacci Sequence</SelectItem>
+              <SelectItem value="riemann_zeta">Riemann Zeta</SelectItem>
+              <SelectItem value="weierstrass">Weierstrass Function</SelectItem>
+              
+              {/* Geometry & Topology */}
+              <SelectItem value="mobius">Möbius Strip</SelectItem>
+              <SelectItem value="torus">Torus</SelectItem>
+              <SelectItem value="hyperbolic">Hyperbolic Geometry</SelectItem>
+              <SelectItem value="spherical">Spherical Geometry</SelectItem>
+              
+              {/* Solitons & Nonlinear Waves */}
+              <SelectItem value="soliton">Soliton</SelectItem>
+              <SelectItem value="breather">Breather Solution</SelectItem>
+              <SelectItem value="kink">Kink Solution</SelectItem>
+              
+              {/* Complex Systems */}
+              <SelectItem value="cellular_automata">Cellular Automata</SelectItem>
+              <SelectItem value="game_of_life">Game of Life</SelectItem>
+              <SelectItem value="neural_network">Neural Network</SelectItem>
+              <SelectItem value="genetic_algorithm">Genetic Algorithm</SelectItem>
+              <SelectItem value="percolation">Percolation Theory</SelectItem>
+              <SelectItem value="ising_model">Ising Model</SelectItem>
+              
+              {/* Interference & Optics */}
+              <SelectItem value="interference">Wave Interference</SelectItem>
+              <SelectItem value="spiral">Fibonacci Spiral</SelectItem>
+              
+              {/* Custom */}
+              <SelectItem value="custom">Custom Equation</SelectItem>
             </SelectContent>
           </Select>
+          
+          {/* Equation Editor Button */}
+          <Button
+            onClick={() => setShowEquationEditor(true)}
+            variant="outline"
+            size="sm"
+            className="w-full flex items-center gap-2 bg-purple-900/20 border-purple-500/30 hover:bg-purple-800/30"
+          >
+            <Calculator className="w-4 h-4" />
+            Open Equation Editor
+          </Button>
         </div>
 
         {/* Wave Parameters */}

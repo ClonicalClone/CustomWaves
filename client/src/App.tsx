@@ -3,11 +3,13 @@ import { Canvas } from '@react-three/fiber';
 import Scene from './components/Scene';
 import { AdvancedControls } from './components/ui/AdvancedControls';
 import { EditableEquation } from './components/ui/EditableEquation';
+import { AdvancedEquationEditor } from './components/ui/AdvancedEquationEditor';
 import { useSurfaceControls } from './lib/stores/useSurfaceControls';
 import './index.css';
 
-// Equation definitions
+// Comprehensive Mathematical Equation Definitions - 50+ Concepts
 const equations: Record<string, { title: string; equation: string; category: string; concept: string }> = {
+  // Wave Theory & Harmonic Analysis
   sin: {
     title: "Harmonic Sine Wave",
     equation: "y = A·sin(fx + st) + A·sin(fz + st·φ)·φ⁻¹ + A·sin((x+z)f/2 + st/2)·φ⁻²",
@@ -26,59 +28,309 @@ const equations: Record<string, { title: string; equation: string; category: str
     category: "Nonlinear Dynamics",
     concept: "Demonstrates bounded periodic behavior and spatial coupling"
   },
+  waves: {
+    title: "Superposition Field",
+    equation: "y = A·[sin(fx + st)·0.4 + sin(fz + √2st)·0.3 + sin((x+z)f√2/2 + √3st/2)·0.25 + sin(rf - 2st)·0.35]",
+    category: "Wave Mechanics",
+    concept: "Demonstrates principle of superposition in multi-dimensional wave systems"
+  },
+  
+  // Electromagnetism & Field Theory
   electric: {
     title: "Electromagnetic Field",
     equation: "y = A·[sin(√2fx + 2st)·e⁻⁰·⁰⁵|x| + cos(√3fz + 1.5st)·e⁻⁰·⁰⁵|z| + sin(rf - 3st)·e⁻⁰·⁰⁵r/2]",
     category: "Electromagnetism",
     concept: "Models wave propagation with realistic attenuation in conducting media"
   },
+  maxwell: {
+    title: "Maxwell Equations",
+    equation: "y = A·[E₀sin(kx - ωt) + B₀cos(kx - ωt + π/2)·e⁻αz]",
+    category: "Classical Field Theory",
+    concept: "Unified description of electric and magnetic phenomena"
+  },
+  
+  // Fluid Dynamics
   ripples: {
     title: "Hydrodynamic Waves",
     equation: "y = A·[sin(rf - st√5)·e⁻⁰·⁰⁸r + sin(rφf - φst)·e⁻⁰·¹²r·φ⁻¹ + cos(rf/2 - st)·e⁻⁰·¹⁵r·0.3]",
     category: "Fluid Dynamics",
     concept: "Simulates surface tension effects and wave attenuation in fluids"
   },
-  spiral: {
-    title: "Fibonacci Spiral",
-    equation: "y = A·[sin(0.618rf + 5.236θ + st)·e⁻⁰·⁰³r + cos(φθ + 0.618st)·0.382]",
-    category: "Mathematical Biology",
-    concept: "Demonstrates natural spiral patterns found in shells and galaxies"
+  navier_stokes: {
+    title: "Navier-Stokes Equation",
+    equation: "y = A·[∂u/∂t + u·∇u = -∇p/ρ + ν∇²u] (simplified visualization)",
+    category: "Fluid Mechanics",
+    concept: "Fundamental equations governing fluid motion"
   },
-  interference: {
-    title: "Double-Slit Interference",
-    equation: "y = A·cos(k·Δd/2)·e⁻⁰·⁰⁴min(d₁,d₂)·sin(k(d₁+d₂)/2 - 2st)",
-    category: "Quantum Optics",
-    concept: "Models wave-particle duality and constructive/destructive interference"
+  
+  // Quantum Mechanics
+  schrodinger: {
+    title: "Schrödinger Equation",
+    equation: "y = A·ψ(x,z,t) = e⁻⁰·¹⁽ˣ²⁺ᶻ²⁾ cos(f(x+z) - st)",
+    category: "Quantum Mechanics",
+    concept: "Time-dependent quantum wave function evolution"
   },
+  quantum_harmonic: {
+    title: "Quantum Harmonic Oscillator",
+    equation: "y = A·H₃(x)e⁻ˣ²/² cos(ωt) where H₃ is 3rd Hermite polynomial",
+    category: "Quantum Physics",
+    concept: "Quantized energy levels in harmonic potential"
+  },
+  quantum_well: {
+    title: "Quantum Well",
+    equation: "y = A·sin(nπx/L) for |x| < L/2, 0 elsewhere",
+    category: "Quantum Confinement",
+    concept: "Particle in a box - fundamental quantum problem"
+  },
+  hydrogen_atom: {
+    title: "Hydrogen Atom Wavefunction",
+    equation: "y = A·R(r)Y(θ,φ) = e⁻ʳ·r·cos(θ + st)",
+    category: "Atomic Physics",
+    concept: "Electron probability distribution in hydrogen"
+  },
+  
+  // Fractals & Chaos Theory
+  mandelbrot: {
+    title: "Mandelbrot Set",
+    equation: "z_{n+1} = z_n² + c, iterate until |z| > 2",
+    category: "Fractal Geometry",
+    concept: "Self-similar structures at all scales"
+  },
+  julia: {
+    title: "Julia Set",
+    equation: "z_{n+1} = z_n² + c (fixed c), dynamic parameter visualization",
+    category: "Complex Dynamics",
+    concept: "Connected vs disconnected fractal boundaries"
+  },
+  newton: {
+    title: "Newton Fractal",
+    equation: "Newton's method for z³ - 1 = 0 convergence basins",
+    category: "Numerical Analysis",
+    concept: "Visualization of root-finding algorithm convergence"
+  },
+  lorenz: {
+    title: "Lorenz Attractor",
+    equation: "dx/dt = σ(y-x), dy/dt = x(ρ-z)-y, dz/dt = xy-βz",
+    category: "Chaos Theory",
+    concept: "Sensitive dependence on initial conditions"
+  },
+  rossler: {
+    title: "Rössler Attractor",
+    equation: "dx/dt = -y-z, dy/dt = x+ay, dz/dt = b+z(x-c)",
+    category: "Dynamical Systems",
+    concept: "Strange attractor with simpler dynamics than Lorenz"
+  },
+  henon: {
+    title: "Hénon Map",
+    equation: "x_{n+1} = 1 - ax_n² + y_n, y_{n+1} = bx_n",
+    category: "Discrete Dynamics",
+    concept: "Two-dimensional chaotic map"
+  },
+  logistic: {
+    title: "Logistic Map",
+    equation: "x_{n+1} = rx_n(1 - x_n), bifurcation parameter r",
+    category: "Population Dynamics",
+    concept: "Route to chaos through period-doubling"
+  },
+  
+  // Partial Differential Equations
   laplace: {
     title: "Laplace Equation",
-    equation: "y = A·[r·cos(fθ + st)·e⁻⁰·¹r + r·sin(2fθ + 0.7st)·e⁻⁰·⁰⁸r·0.5]",
-    category: "Partial Differential Equations",
-    concept: "Models steady-state heat distribution and gravitational potential fields"
+    equation: "∇²φ = 0, solution: φ = r cos(nθ)e⁻ⁿʳ",
+    category: "Elliptic PDEs",
+    concept: "Steady-state problems, harmonic functions"
   },
+  wave_equation: {
+    title: "Wave Equation",
+    equation: "∂²u/∂t² = c²∇²u, standing + traveling waves",
+    category: "Hyperbolic PDEs",
+    concept: "Propagation of disturbances at finite speed"
+  },
+  heat_equation: {
+    title: "Heat Equation",
+    equation: "∂u/∂t = α∇²u, diffusion with exponential decay",
+    category: "Parabolic PDEs",
+    concept: "Thermal diffusion and smoothing processes"
+  },
+  poisson: {
+    title: "Poisson Equation",
+    equation: "∇²φ = ρ/ε₀, electrostatic potential",
+    category: "Elliptic PDEs",
+    concept: "Potential theory with source terms"
+  },
+  helmholtz: {
+    title: "Helmholtz Equation",
+    equation: "∇²u + k²u = 0, wave solutions",
+    category: "Wave Theory",
+    concept: "Time-harmonic wave propagation"
+  },
+  burgers: {
+    title: "Burgers' Equation",
+    equation: "∂u/∂t + u∂u/∂x = ν∂²u/∂x², shock formation",
+    category: "Nonlinear PDEs",
+    concept: "Simplified model of turbulence"
+  },
+  kdv: {
+    title: "Korteweg-de Vries",
+    equation: "∂u/∂t + 6u∂u/∂x + ∂³u/∂x³ = 0, soliton solutions",
+    category: "Integrable Systems",
+    concept: "Shallow water waves, soliton theory"
+  },
+  sine_gordon: {
+    title: "Sine-Gordon Equation",
+    equation: "∂²φ/∂t² - ∂²φ/∂x² + sin(φ) = 0",
+    category: "Nonlinear Waves",
+    concept: "Kink solitons and breather solutions"
+  },
+  nonlinear_schrodinger: {
+    title: "Nonlinear Schrödinger",
+    equation: "i∂ψ/∂t + ∂²ψ/∂x² + |ψ|²ψ = 0",
+    category: "Quantum Nonlinearity",
+    concept: "Self-focusing and envelope solitons"
+  },
+  reaction_diffusion: {
+    title: "Reaction-Diffusion",
+    equation: "∂u/∂t = D∇²u + f(u), pattern formation",
+    category: "Mathematical Biology",
+    concept: "Turing patterns and morphogenesis"
+  },
+  
+  // Special Functions & Number Theory
   fourier: {
     title: "Fourier Series",
-    equation: "y = A·Σₙ₌₁⁵[sin(nfx + st)/n + sin(nfz + 1.2st)/n] + A·cos(xzf/10 + st/2)·0.3",
+    equation: "f(x) = Σ[aₙcos(nx) + bₙsin(nx)], harmonic decomposition",
     category: "Harmonic Analysis",
-    concept: "Represents periodic functions as sum of sinusoidal components"
+    concept: "Frequency domain representation"
   },
   bessel: {
     title: "Bessel Functions",
-    equation: "y = A·[J₀(fr - st)·e⁻⁰·¹|fr-st| + J₁(fr - st)·(fr-st)·e⁻⁰·¹|fr-st|·0.5 + sin(3θ + 0.8st)·0.2]",
+    equation: "J₀(kr)cos(ωt), cylindrical wave solutions",
     category: "Special Functions",
-    concept: "Models vibrations in circular membranes and electromagnetic waves in cylinders"
+    concept: "Circular membrane vibrations"
   },
   legendre: {
     title: "Legendre Polynomials",
-    equation: "y = A·[P₂(x̂)·sin(ft) + P₂(ẑ)·sin(ft) + P₃(x̂)·cos(0.7ft)·0.6]",
+    equation: "P₂(x) = ½(3x² - 1), spherical harmonics basis",
     category: "Orthogonal Polynomials",
-    concept: "Used in spherical harmonics and quantum mechanical angular momentum"
+    concept: "Angular momentum in quantum mechanics"
   },
-  waves: {
-    title: "Superposition Field",
-    equation: "y = A·[sin(fx + st)·0.4 + sin(fz + √2st)·0.3 + sin((x+z)f√2/2 + √3st/2)·0.25 + sin(rf - 2st)·0.35 + modulation]",
-    category: "Wave Mechanics",
-    concept: "Demonstrates principle of superposition in multi-dimensional wave systems"
+  fibonacci: {
+    title: "Fibonacci Sequence",
+    equation: "F_n = F_{n-1} + F_{n-2}, golden ratio convergence",
+    category: "Number Theory",
+    concept: "Natural growth patterns and recursion"
+  },
+  riemann_zeta: {
+    title: "Riemann Zeta Function",
+    equation: "ζ(s) = Σ 1/n^s, analytical continuation",
+    category: "Analytic Number Theory",
+    concept: "Distribution of prime numbers"
+  },
+  weierstrass: {
+    title: "Weierstrass Function",
+    equation: "Σ aⁿcos(bⁿπx), continuous but nowhere differentiable",
+    category: "Real Analysis",
+    concept: "Pathological function challenging intuition"
+  },
+  
+  // Topology & Geometry
+  mobius: {
+    title: "Möbius Strip",
+    equation: "x = (1 + v cos(u/2))cos(u), non-orientable surface",
+    category: "Topology",
+    concept: "Surface with only one side"
+  },
+  torus: {
+    title: "Torus",
+    equation: "x = (R + r cos(v))cos(u), donut-shaped surface",
+    category: "Differential Geometry",
+    concept: "Genus-1 surface, periodic boundary conditions"
+  },
+  hyperbolic: {
+    title: "Hyperbolic Geometry",
+    equation: "ds² = dx²/(1-r²) + dy²/(1-r²), negative curvature",
+    category: "Non-Euclidean Geometry",
+    concept: "Constant negative curvature spaces"
+  },
+  spherical: {
+    title: "Spherical Geometry",
+    equation: "ds² = R²(dθ² + sin²θ dφ²), positive curvature",
+    category: "Riemannian Geometry",
+    concept: "Geometry on curved surfaces"
+  },
+  
+  // Solitons & Nonlinear Waves
+  soliton: {
+    title: "Soliton",
+    equation: "u = A sech²(k(x - vt)), localized wave packet",
+    category: "Nonlinear Waves",
+    concept: "Stable, non-dispersing wave packets"
+  },
+  breather: {
+    title: "Breather Solution",
+    equation: "Oscillating localized solution, energy exchange",
+    category: "Integrable Systems",
+    concept: "Time-periodic, spatially localized waves"
+  },
+  kink: {
+    title: "Kink Solution",
+    equation: "u = tanh(x - vt), topological soliton",
+    category: "Field Theory",
+    concept: "Stable interface between vacuum states"
+  },
+  
+  // Complex Systems & Emergence
+  cellular_automata: {
+    title: "Cellular Automata",
+    equation: "Rule-based evolution, emergent complexity",
+    category: "Complex Systems",
+    concept: "Simple rules generating complex behavior"
+  },
+  game_of_life: {
+    title: "Conway's Game of Life",
+    equation: "Birth/death rules: B3/S23, gliders and oscillators",
+    category: "Artificial Life",
+    concept: "Emergence from simple local interactions"
+  },
+  neural_network: {
+    title: "Neural Network",
+    equation: "y = σ(Wx + b), learning through backpropagation",
+    category: "Machine Learning",
+    concept: "Pattern recognition and function approximation"
+  },
+  genetic_algorithm: {
+    title: "Genetic Algorithm",
+    equation: "Selection, crossover, mutation operations",
+    category: "Evolutionary Computation",
+    concept: "Optimization through simulated evolution"
+  },
+  percolation: {
+    title: "Percolation Theory",
+    equation: "Connected clusters, phase transition",
+    category: "Statistical Physics",
+    concept: "Connectivity in random media"
+  },
+  ising_model: {
+    title: "Ising Model",
+    equation: "H = -J Σ sᵢsⱼ - h Σ sᵢ, spin interactions",
+    category: "Statistical Mechanics",
+    concept: "Phase transitions and critical phenomena"
+  },
+  
+  // Interference & Optics
+  interference: {
+    title: "Wave Interference",
+    equation: "I = I₁ + I₂ + 2√(I₁I₂)cos(δ), double-slit pattern",
+    category: "Wave Optics",
+    concept: "Constructive and destructive interference"
+  },
+  
+  // Custom Equation
+  custom: {
+    title: "Custom Equation",
+    equation: "User-defined mathematical expression",
+    category: "User-Defined",
+    concept: "Flexible mathematical exploration tool"
   }
 };
 
@@ -100,6 +352,9 @@ function App() {
     showGrid,
     autoRotate,
     showEquations,
+    customEquation,
+    equationVariables,
+    showEquationEditor,
     setMathFunction,
     setAmplitude,
     setFrequency,
@@ -115,6 +370,9 @@ function App() {
     setShowTrails,
     setShowGrid,
     setAutoRotate,
+    setCustomEquation,
+    setEquationVariable,
+    setShowEquationEditor,
     reset,
     randomize,
     exportSettings
@@ -193,14 +451,28 @@ function App() {
       
       {showEquations && (
         <EditableEquation
-          equation={equations[mathFunction]?.equation || ""}
-          title={equations[mathFunction]?.title || ""}
-          category={equations[mathFunction]?.category || ""}
-          concept={equations[mathFunction]?.concept || ""}
+          equation={equations[mathFunction]?.equation || customEquation}
+          title={equations[mathFunction]?.title || "Custom Equation"}
+          category={equations[mathFunction]?.category || "User-Defined"}
+          concept={equations[mathFunction]?.concept || "Custom mathematical expression"}
           onEquationChange={(newEquation: string) => {
-            // Custom equation editing logic could be implemented here
-            console.log("New equation:", newEquation);
+            if (mathFunction === 'custom') {
+              setCustomEquation(newEquation);
+            } else {
+              setMathFunction('custom');
+              setCustomEquation(newEquation);
+            }
           }}
+        />
+      )}
+      
+      {showEquationEditor && (
+        <AdvancedEquationEditor
+          equation={customEquation}
+          variables={equationVariables}
+          onEquationChange={setCustomEquation}
+          onVariableChange={setEquationVariable}
+          onClose={() => setShowEquationEditor(false)}
         />
       )}
     </div>

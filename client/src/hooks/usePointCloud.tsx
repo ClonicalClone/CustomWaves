@@ -1,7 +1,14 @@
 import { useCallback } from 'react';
 import { Vector3 } from 'three';
 
-export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference' | 'laplace' | 'fourier' | 'bessel' | 'legendre';
+export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference' | 'laplace' | 'fourier' | 'bessel' | 'legendre' | 
+  'mandelbrot' | 'julia' | 'newton' | 'barnsley' | 'lorenz' | 'rossler' | 'chua' | 'henon' | 'logistic' | 'bifurcation' | 
+  'navier_stokes' | 'schrodinger' | 'maxwell' | 'einstein' | 'dirac' | 'klein_gordon' | 'wave_equation' | 'heat_equation' | 
+  'poisson' | 'helmholtz' | 'burgers' | 'kdv' | 'sine_gordon' | 'nonlinear_schrodinger' | 'reaction_diffusion' | 
+  'fibonacci' | 'pascal' | 'catalan' | 'euler_gamma' | 'riemann_zeta' | 'weierstrass' | 'cantor' | 'sierpinski' | 
+  'mobius' | 'torus' | 'hyperbolic' | 'spherical' | 'elliptic' | 'parabolic' | 'geodesic' | 'curvature' | 
+  'quantum_harmonic' | 'quantum_well' | 'hydrogen_atom' | 'phonon' | 'plasmon' | 'soliton' | 'breather' | 'kink' |
+  'cellular_automata' | 'game_of_life' | 'neural_network' | 'genetic_algorithm' | 'percolation' | 'ising_model' | 'custom';
 export type ColorMode = 'height' | 'velocity' | 'gradient' | 'rainbow';
 export type AnimationMode = 'smooth' | 'pulse' | 'chaotic' | 'freeze';
 
@@ -17,6 +24,8 @@ interface UsePointCloudProps {
   animationMode: AnimationMode;
   turbulence: number;
   mouseInfluence: number;
+  customEquation?: string;
+  equationVariables?: Record<string, number>;
 }
 
 export function usePointCloud({ 
@@ -30,7 +39,9 @@ export function usePointCloud({
   mathFunction,
   animationMode,
   turbulence,
-  mouseInfluence
+  mouseInfluence,
+  customEquation,
+  equationVariables = {}
 }: UsePointCloudProps) {
   
   const calculateMathFunction = useCallback((
@@ -140,6 +151,220 @@ export function usePointCloud({
         const legendre = (P2x + P2z) * Math.sin(timeSpeed * freq) + P3x * Math.cos(timeSpeed * freq * 0.7) * 0.6;
         return legendre * amplitude + mouseEffect;
       
+      // Fractal and Chaos Theory
+      case 'mandelbrot':
+        let zReal = x / width * 4 - 2;
+        let zImag = z / width * 4 - 2;
+        let iterations = 0;
+        const maxIter = 20;
+        while (zReal * zReal + zImag * zImag < 4 && iterations < maxIter) {
+          const temp = zReal * zReal - zImag * zImag + 0.7269 * Math.cos(timeSpeed);
+          zImag = 2 * zReal * zImag + 0.1889 * Math.sin(timeSpeed);
+          zReal = temp;
+          iterations++;
+        }
+        return (iterations / maxIter) * amplitude + mouseEffect;
+      
+      case 'julia':
+        const cReal = 0.285 + 0.01 * Math.cos(timeSpeed);
+        const cImag = 0.01 + 0.01 * Math.sin(timeSpeed);
+        let juliaReal = x / width * 3;
+        let juliaImag = z / width * 3;
+        let juliaIter = 0;
+        while (juliaReal * juliaReal + juliaImag * juliaImag < 4 && juliaIter < 50) {
+          const temp = juliaReal * juliaReal - juliaImag * juliaImag + cReal;
+          juliaImag = 2 * juliaReal * juliaImag + cImag;
+          juliaReal = temp;
+          juliaIter++;
+        }
+        return (juliaIter / 50) * amplitude + mouseEffect;
+      
+      case 'newton':
+        // Newton fractal for z^3 - 1 = 0
+        let newtonReal = x / width * 2;
+        let newtonImag = z / width * 2;
+        for (let i = 0; i < 10; i++) {
+          const denom = 3 * (newtonReal * newtonReal + newtonImag * newtonImag);
+          if (denom === 0) break;
+          const tempReal = (2 * newtonReal + 1 / (newtonReal * newtonReal + newtonImag * newtonImag)) / 3;
+          const tempImag = (2 * newtonImag - newtonImag / (newtonReal * newtonReal + newtonImag * newtonImag)) / 3;
+          newtonReal = tempReal;
+          newtonImag = tempImag;
+        }
+        return (Math.atan2(newtonImag, newtonReal) + Math.PI) / (2 * Math.PI) * amplitude + mouseEffect;
+      
+      // Dynamical Systems
+      case 'lorenz':
+        const sigma = 10, rho = 28, beta = 8/3;
+        const lorenzX = sigma * (z - x) * 0.01;
+        const lorenzZ = (x * (rho - x) - z) * 0.01;
+        return Math.sin(lorenzX + timeSpeed) * Math.cos(lorenzZ + timeSpeed) * amplitude + mouseEffect;
+      
+      case 'rossler':
+        const a = 0.2, b = 0.2, c = 5.7;
+        const rosslerDx = -(z + x * 0.1);
+        const rosslerDz = x + a * z;
+        return Math.sin(rosslerDx * freq + timeSpeed) * Math.cos(rosslerDz * freq + timeSpeed) * amplitude + mouseEffect;
+      
+      case 'henon':
+        const henonA = 1.4, henonB = 0.3;
+        const henonNext = 1 - henonA * x * x + z;
+        return Math.sin(henonNext * freq + timeSpeed) * amplitude + mouseEffect;
+      
+      case 'logistic':
+        const logisticR = 3.57 + 0.4 * Math.sin(timeSpeed * 0.1);
+        let logisticX = Math.abs(x) / width;
+        for (let i = 0; i < 10; i++) {
+          logisticX = logisticR * logisticX * (1 - logisticX);
+        }
+        return logisticX * amplitude + mouseEffect;
+      
+      // Partial Differential Equations
+      case 'navier_stokes':
+        // Simplified fluid dynamics
+        const viscosity = 0.01;
+        const pressure = Math.sin(x * freq) * Math.cos(z * freq);
+        const velocity = -viscosity * (Math.sin(2 * x * freq) + Math.sin(2 * z * freq)) + pressure;
+        return velocity * Math.sin(timeSpeed) * amplitude + mouseEffect;
+      
+      case 'schrodinger':
+        // Time-dependent Schrödinger equation (simplified)
+        const psi = Math.exp(-0.1 * (x * x + z * z)) * Math.cos(freq * (x + z) - timeSpeed);
+        const potential = 0.5 * (x * x + z * z) * 0.01;
+        return (psi - potential) * amplitude + mouseEffect;
+      
+      case 'maxwell':
+        // Maxwell equations - electromagnetic wave
+        const electricField = Math.sin(freq * x - timeSpeed) * Math.exp(-Math.abs(z) * 0.05);
+        const magneticField = Math.cos(freq * x - timeSpeed + Math.PI/2) * Math.exp(-Math.abs(z) * 0.05);
+        return (electricField + magneticField) * amplitude + mouseEffect;
+      
+      case 'wave_equation':
+        // Classic wave equation solution
+        const waveSpeed = 2;
+        const standing = Math.sin(freq * x) * Math.cos(waveSpeed * freq * timeSpeed);
+        const traveling = Math.sin(freq * (x - waveSpeed * timeSpeed)) + Math.sin(freq * (z - waveSpeed * timeSpeed));
+        return (standing + traveling) * amplitude * 0.5 + mouseEffect;
+      
+      case 'heat_equation':
+        // Heat diffusion equation
+        const diffusivity = 0.1;
+        const temp = Math.exp(-diffusivity * timeSpeed) * Math.sin(freq * x) * Math.sin(freq * z);
+        return temp * amplitude + mouseEffect;
+      
+      // Special Functions and Number Theory
+      case 'fibonacci':
+        const fibN = Math.floor(Math.abs(x + z) * freq + 1);
+        let fib1 = 1, fib2 = 1;
+        for (let i = 2; i < fibN && i < 20; i++) {
+          const temp = fib1 + fib2;
+          fib1 = fib2;
+          fib2 = temp;
+        }
+        return Math.sin(fib2 * 0.001 + timeSpeed) * amplitude + mouseEffect;
+      
+      case 'riemann_zeta':
+        // Approximation of Riemann zeta function
+        let zeta = 0;
+        for (let n = 1; n <= 10; n++) {
+          zeta += 1 / Math.pow(n, 2 + 0.1 * Math.sin(x * freq + timeSpeed));
+        }
+        return zeta * Math.sin(z * freq + timeSpeed) * amplitude + mouseEffect;
+      
+      case 'weierstrass':
+        // Weierstrass function (continuous but nowhere differentiable)
+        let weierstrass = 0;
+        for (let n = 0; n < 10; n++) {
+          weierstrass += Math.pow(0.7, n) * Math.cos(Math.pow(3, n) * Math.PI * (x + timeSpeed * 0.1));
+        }
+        return weierstrass * amplitude + mouseEffect;
+      
+      // Geometry and Topology
+      case 'mobius':
+        const u = x / width * 2 * Math.PI;
+        const v = z / width;
+        const mobiusX = (1 + v * Math.cos(u/2)) * Math.cos(u);
+        const mobiusZ = (1 + v * Math.cos(u/2)) * Math.sin(u);
+        return Math.sin(mobiusX * freq + timeSpeed) * Math.cos(mobiusZ * freq + timeSpeed) * amplitude + mouseEffect;
+      
+      case 'torus':
+        const torusR = 3, torusr = 1;
+        const torusU = x / width * 2 * Math.PI;
+        const torusV = z / width * 2 * Math.PI;
+        const torusHeight = torusr * Math.sin(torusV + timeSpeed);
+        return torusHeight * amplitude + mouseEffect;
+      
+      case 'hyperbolic':
+        const hyperX = x / width * 2;
+        const hyperZ = z / width * 2;
+        return Math.sinh(hyperX * freq + timeSpeed) * Math.cosh(hyperZ * freq + timeSpeed) * amplitude * 0.1 + mouseEffect;
+      
+      // Quantum Mechanics
+      case 'quantum_harmonic':
+        const n = 3; // quantum number
+        const quantumX = x / width * 4;
+        const hermite = (8 * quantumX * quantumX * quantumX - 12 * quantumX); // H3(x)
+        const wavefunction = hermite * Math.exp(-0.5 * quantumX * quantumX) * Math.cos(timeSpeed * (n + 0.5));
+        return wavefunction * amplitude * 0.1 + mouseEffect;
+      
+      case 'quantum_well':
+        const wellWidth = 2;
+        const wellX = x / width * wellWidth;
+        if (Math.abs(wellX) < wellWidth/2) {
+          const psi = Math.sin(Math.PI * (wellX + wellWidth/2) / wellWidth) * Math.cos(timeSpeed);
+          return psi * amplitude + mouseEffect;
+        }
+        return 0 + mouseEffect;
+      
+      case 'hydrogen_atom':
+        const hydrogenR = Math.sqrt(x*x + z*z) / width * 5;
+        const hydrogenTheta = Math.atan2(z, x);
+        const radial = Math.exp(-hydrogenR) * hydrogenR;
+        const angular = Math.cos(hydrogenTheta + timeSpeed);
+        return radial * angular * amplitude + mouseEffect;
+      
+      // Solitons and Nonlinear Waves
+      case 'soliton':
+        const solitonSpeed = 1;
+        const solitonWidth = 1;
+        const sech = 2 / (Math.exp((x - solitonSpeed * timeSpeed) / solitonWidth) + Math.exp(-(x - solitonSpeed * timeSpeed) / solitonWidth));
+        return sech * sech * amplitude + mouseEffect;
+      
+      case 'sine_gordon':
+        const sineGordon = 4 * Math.atan(Math.exp(x / width - timeSpeed));
+        return Math.sin(sineGordon) * amplitude + mouseEffect;
+      
+      case 'kdv':
+        // Korteweg-de Vries equation solution
+        const kdvSoliton = 12 * Math.pow(1 / Math.cosh(2 * (x / width - timeSpeed)), 2);
+        return kdvSoliton * amplitude * 0.1 + mouseEffect;
+      
+      // Cellular Automata and Complex Systems
+      case 'cellular_automata':
+        const cellX = Math.floor(x / width * 20) + 10;
+        const cellZ = Math.floor(z / width * 20) + 10;
+        const cellState = ((cellX + cellZ + Math.floor(timeSpeed)) % 2) === 0 ? 1 : 0;
+        return cellState * amplitude + mouseEffect;
+      
+      case 'game_of_life':
+        const lifeX = Math.floor(x / width * 10) + 5;
+        const lifeZ = Math.floor(z / width * 10) + 5;
+        const neighbors = Math.sin(lifeX + timeSpeed) + Math.cos(lifeZ + timeSpeed);
+        const alive = Math.abs(neighbors) > 0.5 ? 1 : 0;
+        return alive * amplitude + mouseEffect;
+      
+      // Custom equation support
+      case 'custom':
+        if (customEquation) {
+          try {
+            return evaluateCustomEquation(customEquation, x, z, timeSpeed, equationVariables) + mouseEffect;
+          } catch (e) {
+            console.warn('Custom equation evaluation failed:', e);
+            return mouseEffect;
+          }
+        }
+        return mouseEffect;
+      
       case 'waves':
       default:
         // Complex wave superposition with mathematical sophistication
@@ -208,8 +433,57 @@ export function usePointCloud({
       }
     }
   }, [calculateMathFunction]);
-  
+
   return {
     updateSurface
   };
+}
+
+// Custom equation evaluator
+function evaluateCustomEquation(
+  equation: string, 
+  x: number, 
+  z: number, 
+  t: number, 
+  variables: Record<string, number>
+): number {
+  // Create a safe evaluation context
+  const context = {
+    x, z, t,
+    sin: Math.sin,
+    cos: Math.cos,
+    tan: Math.tan,
+    atan: Math.atan,
+    exp: Math.exp,
+    log: Math.log,
+    sqrt: Math.sqrt,
+    abs: Math.abs,
+    pow: Math.pow,
+    sinh: Math.sinh,
+    cosh: Math.cosh,
+    tanh: Math.tanh,
+    ...variables
+  };
+  
+  // Simple and safe equation parser
+  let processedEquation = equation;
+  
+  // Replace mathematical constants and functions
+  Object.keys(context).forEach(key => {
+    const regex = new RegExp(`\\b${key}\\b`, 'g');
+    processedEquation = processedEquation.replace(regex, `context.${key}`);
+  });
+  
+  // Replace common mathematical operators
+  processedEquation = processedEquation.replace(/\^/g, '**');
+  
+  try {
+    // Use Function constructor for safe evaluation
+    const func = new Function('context', `with(context) { return ${processedEquation}; }`);
+    const result = func(context);
+    return isNaN(result) ? 0 : result;
+  } catch (error) {
+    console.warn('Equation evaluation failed:', error);
+    return 0;
+  }
 }

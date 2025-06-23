@@ -1,6 +1,13 @@
 import { create } from 'zustand';
 
-export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference' | 'laplace' | 'fourier' | 'bessel' | 'legendre';
+export type MathFunction = 'waves' | 'sin' | 'cos' | 'tan' | 'electric' | 'ripples' | 'spiral' | 'interference' | 'laplace' | 'fourier' | 'bessel' | 'legendre' | 
+  'mandelbrot' | 'julia' | 'newton' | 'barnsley' | 'lorenz' | 'rossler' | 'chua' | 'henon' | 'logistic' | 'bifurcation' | 
+  'navier_stokes' | 'schrodinger' | 'maxwell' | 'einstein' | 'dirac' | 'klein_gordon' | 'wave_equation' | 'heat_equation' | 
+  'poisson' | 'helmholtz' | 'burgers' | 'kdv' | 'sine_gordon' | 'nonlinear_schrodinger' | 'reaction_diffusion' | 
+  'fibonacci' | 'pascal' | 'catalan' | 'euler_gamma' | 'riemann_zeta' | 'weierstrass' | 'cantor' | 'sierpinski' | 
+  'mobius' | 'torus' | 'hyperbolic' | 'spherical' | 'elliptic' | 'parabolic' | 'geodesic' | 'curvature' | 
+  'quantum_harmonic' | 'quantum_well' | 'hydrogen_atom' | 'phonon' | 'plasmon' | 'soliton' | 'breather' | 'kink' |
+  'cellular_automata' | 'game_of_life' | 'neural_network' | 'genetic_algorithm' | 'percolation' | 'ising_model' | 'custom';
 export type ColorMode = 'height' | 'velocity' | 'gradient' | 'rainbow';
 export type AnimationMode = 'smooth' | 'pulse' | 'chaotic' | 'freeze';
 
@@ -29,6 +36,11 @@ interface SurfaceControlsState {
   autoRotate: boolean;
   showEquations: boolean;
   
+  // Custom Equation Editor
+  customEquation: string;
+  equationVariables: Record<string, number>;
+  showEquationEditor: boolean;
+  
   // Actions
   setMathFunction: (func: MathFunction) => void;
   setAmplitude: (value: number) => void;
@@ -46,6 +58,9 @@ interface SurfaceControlsState {
   setShowGrid: (value: boolean) => void;
   setAutoRotate: (value: boolean) => void;
   setShowEquations: (value: boolean) => void;
+  setCustomEquation: (equation: string) => void;
+  setEquationVariable: (name: string, value: number) => void;
+  setShowEquationEditor: (show: boolean) => void;
   reset: () => void;
   randomize: () => void;
   exportSettings: () => string;
@@ -68,6 +83,19 @@ const defaultValues = {
   showGrid: false,
   autoRotate: false,
   showEquations: true,
+  customEquation: 'A * sin(x * f + t * s) + A * cos(z * f + t * s * 0.7)',
+  equationVariables: {
+    A: 2.0,
+    f: 0.8,
+    s: 1.2,
+    c: 1.0,
+    pi: Math.PI,
+    e: Math.E,
+    phi: 1.618033988749,
+    sqrt2: Math.sqrt(2),
+    sqrt3: Math.sqrt(3)
+  },
+  showEquationEditor: false,
 };
 
 export const useSurfaceControls = create<SurfaceControlsState>((set, get) => ({
@@ -89,11 +117,17 @@ export const useSurfaceControls = create<SurfaceControlsState>((set, get) => ({
   setShowGrid: (value) => set({ showGrid: value }),
   setAutoRotate: (value) => set({ autoRotate: value }),
   setShowEquations: (value) => set({ showEquations: value }),
+  setCustomEquation: (equation) => set({ customEquation: equation }),
+  setEquationVariable: (name, value) => set((state) => ({
+    equationVariables: { ...state.equationVariables, [name]: value }
+  })),
+  setShowEquationEditor: (show) => set({ showEquationEditor: show }),
   
   reset: () => set(defaultValues),
   
   randomize: () => {
-    const functions: MathFunction[] = ['waves', 'sin', 'cos', 'tan', 'electric', 'ripples', 'spiral', 'interference', 'laplace', 'fourier', 'bessel', 'legendre'];
+    const functions: MathFunction[] = ['waves', 'sin', 'cos', 'tan', 'electric', 'ripples', 'spiral', 'interference', 'laplace', 'fourier', 'bessel', 'legendre', 
+      'mandelbrot', 'julia', 'newton', 'lorenz', 'rossler', 'henon', 'navier_stokes', 'schrodinger', 'fibonacci', 'mobius', 'quantum_harmonic'];
     const colorModes: ColorMode[] = ['height', 'velocity', 'gradient', 'rainbow'];
     const animationModes: AnimationMode[] = ['smooth', 'pulse', 'chaotic'];
     
@@ -129,6 +163,8 @@ export const useSurfaceControls = create<SurfaceControlsState>((set, get) => ({
       showTrails: state.showTrails,
       showGrid: state.showGrid,
       autoRotate: state.autoRotate,
+      customEquation: state.customEquation,
+      equationVariables: state.equationVariables,
     }, null, 2);
   },
 }));

@@ -33,7 +33,9 @@ function PointCloudSurface({
     resolution: storeResolution,
     mouseInfluence,
     animationMode,
-    turbulence
+    turbulence,
+    customEquation,
+    equationVariables
   } = useSurfaceControls();
   
   const actualResolution = resolution || storeResolution;
@@ -96,7 +98,9 @@ function PointCloudSurface({
     mathFunction,
     animationMode,
     turbulence,
-    mouseInfluence
+    mouseInfluence,
+    customEquation,
+    equationVariables
   });
   
   // Create geometry and material
