@@ -249,15 +249,15 @@ export function AdvancedEquationEditor({
               
               {/* Quick Insert Buttons */}
               <div className="grid grid-cols-4 lg:grid-cols-8 gap-1">
-                {['π', 'e', 'φ', '√2'].map(const => (
+                {['π', 'e', 'φ', '√2'].map(constant => (
                   <Button
-                    key={const}
+                    key={constant}
                     variant="outline"
                     size="sm"
-                    onClick={() => insertConstant(const === 'π' ? 'pi' : const === 'φ' ? 'phi' : const === '√2' ? 'sqrt2' : 'e')}
+                    onClick={() => insertConstant(constant === 'π' ? 'pi' : constant === 'φ' ? 'phi' : constant === '√2' ? 'sqrt2' : 'e')}
                     className="text-xs h-7 p-1"
                   >
-                    {const}
+                    {constant}
                   </Button>
                 ))}
                 {['sin', 'cos', 'exp', 'sqrt'].map(func => (
