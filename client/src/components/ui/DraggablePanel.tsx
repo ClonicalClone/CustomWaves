@@ -70,7 +70,7 @@ export function DraggablePanel({
         top: position.y,
         minWidth: '300px',
         maxWidth: '600px',
-        maxHeight: '80vh'
+        maxHeight: '90vh'
       }}
     >
       {/* Header */}

@@ -442,8 +442,8 @@ const equations: Record<string, { title: string; equation: string; category: str
 };
 
 function App() {
-  const [showControls, setShowControls] = useState(false);
-  const [showEquationDisplay, setShowEquationDisplay] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+  const [showEquationDisplay, setShowEquationDisplay] = useState(true);
   
   const {
     mathFunction,
@@ -523,28 +523,29 @@ function App() {
         </Suspense>
       </Canvas>
       
-      {/* Floating Panel Controls */}
-      <div className="fixed top-4 left-4 flex gap-2 z-50">
-        <Button
-          onClick={() => setShowControls(!showControls)}
-          className="bg-gray-800 hover:bg-gray-700 border border-gray-600"
-        >
-          <Settings className="w-4 h-4 mr-2" />
-          Controls
-        </Button>
-        <Button
-          onClick={() => setShowEquationDisplay(!showEquationDisplay)}
-          className="bg-gray-800 hover:bg-gray-700 border border-gray-600"
-        >
-          <FileText className="w-4 h-4 mr-2" />
-          Equation
-        </Button>
+      {/* Quick Access Buttons */}
+      <div className="fixed top-4 right-4 flex gap-2 z-50">
+        {!showControls && (
+          <Button
+            onClick={() => setShowControls(true)}
+            className="bg-gray-800 hover:bg-gray-700 border border-gray-600"
+          >
+            <Settings className="w-4 h-4" />
+          </Button>
+        )}
+        {!showEquationDisplay && (
+          <Button
+            onClick={() => setShowEquationDisplay(true)}
+            className="bg-gray-800 hover:bg-gray-700 border border-gray-600"
+          >
+            <FileText className="w-4 h-4" />
+          </Button>
+        )}
         <Button
           onClick={() => setShowEquationEditor(true)}
           className="bg-gray-800 hover:bg-gray-700 border border-gray-600"
         >
-          <Calculator className="w-4 h-4 mr-2" />
-          Editor
+          <Calculator className="w-4 h-4" />
         </Button>
       </div>
       
@@ -552,7 +553,7 @@ function App() {
       {showControls && (
         <DraggablePanel
           title="Surface Controls"
-          initialPosition={{ x: 20, y: 80 }}
+          initialPosition={{ x: 20, y: 20 }}
           onClose={() => setShowControls(false)}
           defaultMinimized={false}
         >
@@ -598,7 +599,7 @@ function App() {
       {showEquationDisplay && (
         <DraggablePanel
           title="Equation Display"
-          initialPosition={{ x: Math.max(400, window.innerWidth - 420), y: 80 }}
+          initialPosition={{ x: Math.max(400, window.innerWidth - 420), y: 20 }}
           onClose={() => setShowEquationDisplay(false)}
           defaultMinimized={false}
         >
