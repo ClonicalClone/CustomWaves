@@ -360,8 +360,8 @@ export function usePointCloud({
           try {
             const result = evaluateCustomEquation(customEquation, x, z, timeSpeed, equationVariables);
             // Clamp result to prevent extreme values that could cause performance issues
-            const clampedResult = Math.max(-100, Math.min(100, result));
-            return clampedResult * amplitude + mouseEffect;
+            const clampedResult = Math.max(-10, Math.min(10, result));
+            return clampedResult + mouseEffect;
           } catch (e) {
             console.warn('Custom equation evaluation failed:', e);
             return mouseEffect;
@@ -508,12 +508,27 @@ function evaluateCustomEquation(
         processedEquation = processedEquation.replace(regex, `vars.${key}`);
       });
       
-      // Create the evaluation function
+      // Also handle common variable patterns
+      processedEquation = processedEquation.replace(/\bx\b/g, 'x');
+      processedEquation = processedEquation.replace(/\bz\b/g, 'z');
+      processedEquation = processedEquation.replace(/\bt\b/g, 't');
+      
+      // Create the evaluation function with direct variable access
       const funcBody = `
         const vars = arguments[3];
         const x = arguments[0];
         const z = arguments[1]; 
         const t = arguments[2];
+        // Make variables directly available
+        const A = vars.A || 1;
+        const f = vars.f || 1;
+        const s = vars.s || 1;
+        const sin = vars.sin;
+        const cos = vars.cos;
+        const exp = vars.exp;
+        const sqrt = vars.sqrt;
+        const abs = vars.abs;
+        const pow = vars.pow;
         try {
           const result = ${processedEquation};
           return isFinite(result) ? result : 0;
