@@ -523,102 +523,74 @@ function App() {
         </Suspense>
       </Canvas>
       
-      {/* Quick Access Buttons */}
-      <div className="fixed top-4 right-4 flex gap-2 z-50">
-        {!showControls && (
-          <Button
-            onClick={() => setShowControls(true)}
-            className="bg-gray-800 hover:bg-gray-700 border border-gray-600"
-          >
-            <Settings className="w-4 h-4" />
-          </Button>
-        )}
-        {!showEquationDisplay && (
-          <Button
-            onClick={() => setShowEquationDisplay(true)}
-            className="bg-gray-800 hover:bg-gray-700 border border-gray-600"
-          >
-            <FileText className="w-4 h-4" />
-          </Button>
-        )}
-        <Button
-          onClick={() => setShowEquationEditor(true)}
-          className="bg-gray-800 hover:bg-gray-700 border border-gray-600"
-        >
-          <Calculator className="w-4 h-4" />
-        </Button>
-      </div>
+      {/* Left side controls - draggable version of original layout */}
+      <DraggablePanel
+        title="Advanced Controls"
+        initialPosition={{ x: 20, y: 20 }}
+        onClose={() => {}}
+        defaultMinimized={false}
+        className="w-80"
+      >
+        <AdvancedControls
+          mathFunction={mathFunction}
+          amplitude={amplitude}
+          frequency={frequency}
+          speed={speed}
+          complexity={complexity}
+          colorMode={colorMode}
+          pointSize={pointSize}
+          resolution={resolution}
+          mouseInfluence={mouseInfluence}
+          animationMode={animationMode}
+          turbulence={turbulence}
+          damping={damping}
+          showTrails={showTrails}
+          showGrid={showGrid}
+          autoRotate={autoRotate}
+          onMathFunctionChange={setMathFunction}
+          onAmplitudeChange={setAmplitude}
+          onFrequencyChange={setFrequency}
+          onSpeedChange={setSpeed}
+          onComplexityChange={setComplexity}
+          onColorModeChange={setColorMode}
+          onPointSizeChange={setPointSize}
+          onResolutionChange={setResolution}
+          onMouseInfluenceChange={setMouseInfluence}
+          onAnimationModeChange={setAnimationMode}
+          onTurbulenceChange={setTurbulence}
+          onDampingChange={setDamping}
+          onShowTrailsChange={setShowTrails}
+          onShowGridChange={setShowGrid}
+          onAutoRotateChange={setAutoRotate}
+          onReset={reset}
+          onRandomize={randomize}
+          onExport={handleExport}
+        />
+      </DraggablePanel>
       
-      {/* Draggable Controls Panel */}
-      {showControls && (
-        <DraggablePanel
-          title="Surface Controls"
-          initialPosition={{ x: 20, y: 20 }}
-          onClose={() => setShowControls(false)}
-          defaultMinimized={false}
-        >
-          <AdvancedControls
-            mathFunction={mathFunction}
-            amplitude={amplitude}
-            frequency={frequency}
-            speed={speed}
-            complexity={complexity}
-            colorMode={colorMode}
-            pointSize={pointSize}
-            resolution={resolution}
-            mouseInfluence={mouseInfluence}
-            animationMode={animationMode}
-            turbulence={turbulence}
-            damping={damping}
-            showTrails={showTrails}
-            showGrid={showGrid}
-            autoRotate={autoRotate}
-            onMathFunctionChange={setMathFunction}
-            onAmplitudeChange={setAmplitude}
-            onFrequencyChange={setFrequency}
-            onSpeedChange={setSpeed}
-            onComplexityChange={setComplexity}
-            onColorModeChange={setColorMode}
-            onPointSizeChange={setPointSize}
-            onResolutionChange={setResolution}
-            onMouseInfluenceChange={setMouseInfluence}
-            onAnimationModeChange={setAnimationMode}
-            onTurbulenceChange={setTurbulence}
-            onDampingChange={setDamping}
-            onShowTrailsChange={setShowTrails}
-            onShowGridChange={setShowGrid}
-            onAutoRotateChange={setAutoRotate}
-            onReset={reset}
-            onRandomize={randomize}
-            onExport={handleExport}
-          />
-        </DraggablePanel>
-      )}
-      
-      {/* Draggable Equation Display */}
-      {showEquationDisplay && (
-        <DraggablePanel
-          title="Equation Display"
-          initialPosition={{ x: Math.max(400, window.innerWidth - 420), y: 20 }}
-          onClose={() => setShowEquationDisplay(false)}
-          defaultMinimized={false}
-        >
-          <EditableEquation
-            equation={equations[mathFunction]?.equation || customEquation}
-            title={equations[mathFunction]?.title || "Custom Equation"}
-            category={equations[mathFunction]?.category || "User-Defined"}
-            concept={equations[mathFunction]?.concept || "Custom mathematical expression"}
-            onEquationChange={(newEquation: string) => {
-              if (mathFunction === 'custom') {
-                setCustomEquation(newEquation);
-              } else {
-                setMathFunction('custom');
-                setCustomEquation(newEquation);
-              }
-            }}
-          />
-        </DraggablePanel>
-      )}
+      {/* Right side equation display - draggable version of original layout */}
+      <DraggablePanel
+        title="Equation Display"
+        initialPosition={{ x: window.innerWidth - 420, y: 20 }}
+        onClose={() => {}}
+        defaultMinimized={false}
+        className="w-96"
+      >
+        <EditableEquation
+          equation={equations[mathFunction]?.equation || customEquation}
+          title={equations[mathFunction]?.title || "Custom Equation"}
+          category={equations[mathFunction]?.category || "User-Defined"}
+          concept={equations[mathFunction]?.concept || "Custom mathematical expression"}
+          onEquationChange={(newEquation: string) => {
+            if (mathFunction === 'custom') {
+              setCustomEquation(newEquation);
+            } else {
+              setMathFunction('custom');
+              setCustomEquation(newEquation);
+            }
+          }}
+        />
+      </DraggablePanel>
       
       {/* Equation Editor Modal */}
       {showEquationEditor && (

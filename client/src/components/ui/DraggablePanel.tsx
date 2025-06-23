@@ -68,8 +68,6 @@ export function DraggablePanel({
       style={{
         left: position.x,
         top: position.y,
-        minWidth: '300px',
-        maxWidth: '600px',
         maxHeight: '90vh'
       }}
     >
@@ -101,6 +99,7 @@ export function DraggablePanel({
               size="sm"
               onClick={onClose}
               className="w-6 h-6 p-0 hover:bg-gray-700"
+              style={{ display: 'none' }}
             >
               <X className="w-3 h-3" />
             </Button>
